@@ -20,10 +20,9 @@
 import { google } from "googleapis";
 
 function getServiceAccountCredentials() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64;
-  if (!raw) throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 environment variable.");
-  const json = Buffer.from(raw, "base64").toString("utf8");
-  return JSON.parse(json);
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  if (!raw) throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_KEY environment variable.");
+  return JSON.parse(raw);
 }
 
 function isValidEmail(email) {
@@ -62,7 +61,6 @@ export default async function handler(req, res) {
     const drive = google.drive({ version: "v3", auth });
     const docs = google.docs({ version: "v1", auth });
 
-    // 1. Create an empty Google Doc inside the shared submissions folder
     const file = await drive.files.create({
       requestBody: {
         name: docTitle,
@@ -73,7 +71,6 @@ export default async function handler(req, res) {
     });
     const docId = file.data.id;
 
-    // 2. Insert the application content as plain text
     await docs.documents.batchUpdate({
       documentId: docId,
       requestBody: {
@@ -81,8 +78,6 @@ export default async function handler(req, res) {
       },
     });
 
-    // 3. Share with the signer and the org — this is what triggers Google's
-    //    automatic "someone shared a document with you" email to each person.
     const recipients = [...new Set([signerEmail, orgEmail])];
     for (const email of recipients) {
       await drive.permissions.create({
