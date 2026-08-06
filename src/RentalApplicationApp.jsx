@@ -1,19 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { jsPDF } from "jspdf";
+import React, { useState, useCallback } from "react";
+import { Home, User, Building2, Briefcase, Users, ShieldCheck, DollarSign, PenLine } from "lucide-react";
 import {
-  Home, User, Building2, Briefcase, Users, ShieldCheck, DollarSign,
-  PenLine, ChevronLeft, ChevronRight, CheckCircle2, Loader2, AlertTriangle,
-  RotateCcw, Download, Type
-} from "lucide-react";
-
-// ---------- Design tokens (matches the IJAM Housing document series) ----------
-const INK = "#1A1A1A";
-const CHARCOAL = "#2B2B2B";
-const SLATE = "#595959";
-const MIDGREY = "#8C8C8C";
-const LIGHTGREY = "#D9D9D9";
-const PALEGREY = "#F2F2F2";
-const ORG_EMAIL = "Ijamhousing@gmail.com";
+  ErrorBoundary, Field, TextInput, TextArea, YesNo, SectionHeading, Callout,
+  AppHeader, NavButtons, SuccessScreen, SignatureField, SubmitErrorBox, SubmitButton,
+  useDraftStorage, downloadDocumentPdf, submitToDrive, todayStr,
+  INK, CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, ORG_EMAIL,
+} from "./formKit.jsx";
 
 const STEPS = [
   { key: "property", label: "Property", icon: Home },
@@ -40,160 +32,23 @@ const emptyForm = {
   signerEmail: "",
 };
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-// ---------- Small UI atoms ----------
-function Field({ label, children, span = 1, required = false }) {
-  return (
-    <div style={{ gridColumn: span === 2 ? "span 2" : "span 1" }} className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-semibold tracking-wide" style={{ color: SLATE }}>
-        {label}{required && <span style={{ color: MIDGREY }}> *</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-const inputClass =
-  "w-full rounded-md border px-3 py-2.5 text-[15px] outline-none transition-colors focus:ring-2";
-const inputStyle = {
-  borderColor: LIGHTGREY,
-  color: INK,
-  backgroundColor: "#FFFFFF",
-};
-
-function TextInput(props) {
-  return (
-    <input
-      {...props}
-      className={inputClass}
-      style={{ ...inputStyle, "--tw-ring-color": CHARCOAL }}
-      onFocus={(e) => (e.target.style.borderColor = CHARCOAL)}
-      onBlur={(e) => (e.target.style.borderColor = LIGHTGREY)}
-    />
-  );
-}
-
-function TextArea(props) {
-  return (
-    <textarea
-      {...props}
-      rows={props.rows || 3}
-      className={inputClass + " resize-none"}
-      style={{ ...inputStyle }}
-      onFocus={(e) => (e.target.style.borderColor = CHARCOAL)}
-      onBlur={(e) => (e.target.style.borderColor = LIGHTGREY)}
-    />
-  );
-}
-
-function YesNo({ value, onChange }) {
-  return (
-    <div className="flex gap-2">
-      {["Yes", "No"].map((opt) => (
-        <button
-          type="button"
-          key={opt}
-          onClick={() => onChange(opt)}
-          className="px-4 py-2 rounded-md text-sm font-medium border transition-colors"
-          style={
-            value === opt
-              ? { backgroundColor: CHARCOAL, color: "#fff", borderColor: CHARCOAL }
-              : { backgroundColor: "#fff", color: SLATE, borderColor: LIGHTGREY }
-          }
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function SectionHeading({ num, title }) {
-  return (
-    <div className="mb-5 pb-2" style={{ borderBottom: `1px solid ${LIGHTGREY}` }}>
-      <span className="text-[13px] font-bold mr-2" style={{ color: MIDGREY }}>{num}</span>
-      <span className="text-[15px] font-bold tracking-wide" style={{ color: CHARCOAL }}>{title.toUpperCase()}</span>
-    </div>
-  );
-}
-
-// ---------- Error boundary (so a bug shows a message instead of a blank screen) ----------
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { error };
-  }
-  render() {
-    if (this.state.error) {
-      return (
-        <div style={{ minHeight: "100vh", backgroundColor: PALEGREY, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ maxWidth: 420, background: "#fff", border: `1px solid ${LIGHTGREY}`, borderRadius: 12, padding: 28 }}>
-            <h1 style={{ color: CHARCOAL, fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Something went wrong loading this form</h1>
-            <p style={{ color: SLATE, fontSize: 13, marginBottom: 12 }}>
-              {String(this.state.error && this.state.error.message ? this.state.error.message : this.state.error)}
-            </p>
-            <button
-              onClick={() => this.setState({ error: null })}
-              style={{ backgroundColor: CHARCOAL, color: "#fff", border: "none", borderRadius: 8, padding: "10px 16px", fontSize: 13, fontWeight: 600 }}
-            >
-              Try again
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-// ---------- Main App ----------
 function RentalApplicationForm() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(emptyForm);
-  const [submitState, setSubmitState] = useState("idle"); // idle | sending | success | error
+  const [submitState, setSubmitState] = useState("idle");
   const [resultMessage, setResultMessage] = useState("");
   const [resultLink, setResultLink] = useState(null);
-  const [restoredNotice, setRestoredNotice] = useState(false);
+
+  const draft = useDraftStorage("draft:rental-application", emptyForm, setForm);
 
   const set = (key) => (e) => {
     const val = e && e.target ? (e.target.type === "checkbox" ? e.target.checked : e.target.value) : e;
-    setForm((f) => ({ ...f, [key]: val }));
+    setForm((f) => {
+      const next = { ...f, [key]: val };
+      draft.save(next);
+      return next;
+    });
   };
-
-  const storageAvailable = typeof window !== "undefined" && !!window.localStorage;
-
-  // Restore draft
-  useEffect(() => {
-    if (!storageAvailable) return;
-    try {
-      const raw = window.localStorage.getItem("draft:rental-application");
-      if (raw) {
-        setForm({ ...emptyForm, ...JSON.parse(raw) });
-        setRestoredNotice(true);
-      }
-    } catch (e) {
-      // no draft saved yet, or storage unavailable — safe to ignore
-    }
-  }, []);
-
-  // Autosave draft
-  useEffect(() => {
-    if (!storageAvailable) return;
-    const t = setTimeout(() => {
-      try {
-        window.localStorage.setItem("draft:rental-application", JSON.stringify(form));
-      } catch (e) {
-        // storage not available in this environment — safe to ignore
-      }
-    }, 500);
-    return () => clearTimeout(t);
-  }, [form]);
 
   const isSignStep = STEPS[step].key === "sign";
   const canGoNext = step < STEPS.length - 1;
@@ -201,7 +56,6 @@ function RentalApplicationForm() {
 
   const buildDocumentText = useCallback(() => {
     const f = form;
-    const sig = `Typed signature: ${f.typedSignature}`;
     return `RENTAL APPLICATION
 Submitted: ${new Date().toLocaleString()}
 
@@ -265,7 +119,7 @@ Applicant acknowledged the non-refundable application fee: ${f.appFeeAcknowledge
 
 10. SIGNATURE
 Signed by: ${f.fullName}
-${sig}
+Typed signature: ${f.typedSignature}
 Date signed: ${f.signatureDate}
 Signer email: ${f.signerEmail}
 By signing, the applicant certified that all information provided is true and complete to the best of their knowledge.
@@ -276,38 +130,16 @@ By signing, the applicant certified that all information provided is true and co
     setSubmitState("sending");
     setResultMessage("");
     setResultLink(null);
-
     const docText = buildDocumentText();
     const dateLabel = form.signatureDate || todayStr();
     const docTitle = `Rental Application - ${form.fullName || "Applicant"} - ${dateLabel}`;
 
     try {
-      const response = await fetch("/api/submit-application", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docTitle,
-          docText,
-          signerEmail: form.signerEmail,
-        }),
+      const data = await submitToDrive({
+        docTitle, docText, signerEmail: form.signerEmail,
+        shareMessage: "Attached is the completed and signed Rental Application.",
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
-
-      // Save a permanent local record regardless of Drive outcome
-      if (storageAvailable) {
-        try {
-          window.localStorage.setItem(
-            `submission:${Date.now()}`,
-            JSON.stringify({ form, submittedAt: new Date().toISOString(), driveLink: data.link })
-          );
-          window.localStorage.removeItem("draft:rental-application");
-        } catch (e) {
-          // non-critical — the Drive submission already succeeded
-        }
-      }
-
+      draft.clear();
       setResultMessage(`This application was saved and shared with ${form.signerEmail} and ${ORG_EMAIL}.`);
       setResultLink(data.link || null);
       setSubmitState("success");
@@ -320,150 +152,39 @@ By signing, the applicant certified that all information provided is true and co
   };
 
   const downloadCopy = () => {
-    const doc = new jsPDF({ unit: "pt", format: "letter" });
-    const marginL = 56;
-    const marginR = 56;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const contentWidth = pageWidth - marginL - marginR;
-    let y = 64;
-
-    const CHARCOAL_RGB = [43, 43, 43];
-    const SLATE_RGB = [89, 89, 89];
-    const INK_RGB = [26, 26, 26];
-    const LIGHTGREY_RGB = [217, 217, 217];
-
-    const ensureSpace = (needed) => {
-      if (y + needed > pageHeight - 56) {
-        doc.addPage();
-        y = 64;
-      }
-    };
-
-    // Title
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(...CHARCOAL_RGB);
-    doc.text("RENTAL APPLICATION", marginL, y);
-    y += 18;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(10);
-    doc.setTextColor(...SLATE_RGB);
-    doc.text(`Submitted: ${new Date().toLocaleString()}`, marginL, y);
-    y += 10;
-    doc.setDrawColor(...CHARCOAL_RGB);
-    doc.setLineWidth(1.4);
-    doc.line(marginL, y, pageWidth - marginR, y);
-    y += 22;
-
-    const lines = buildDocumentText().split("\n");
-    lines.forEach((rawLine) => {
-      const line = rawLine.trimEnd();
-      const isSectionHeader = /^\d+\.\s[A-Z& ]+$/.test(line);
-      const isBlank = line.trim().length === 0;
-
-      if (isBlank) {
-        y += 8;
-        return;
-      }
-
-      if (isSectionHeader) {
-        ensureSpace(26);
-        y += 10;
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11.5);
-        doc.setTextColor(...CHARCOAL_RGB);
-        doc.text(line, marginL, y);
-        y += 4;
-        doc.setDrawColor(...LIGHTGREY_RGB);
-        doc.setLineWidth(0.75);
-        doc.line(marginL, y + 4, pageWidth - marginR, y + 4);
-        y += 16;
-        return;
-      }
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...INK_RGB);
-      const wrapped = doc.splitTextToSize(line, contentWidth);
-      wrapped.forEach((wLine) => {
-        ensureSpace(14);
-        doc.text(wLine, marginL, y);
-        y += 14;
-      });
+    downloadDocumentPdf({
+      title: "RENTAL APPLICATION",
+      subtitle: `Submitted: ${new Date().toLocaleString()}`,
+      docText: buildDocumentText(),
+      fileName: `Rental_Application_${(form.fullName || "applicant").replace(/\s+/g, "_")}.pdf`,
     });
-
-    doc.save(`Rental_Application_${(form.fullName || "applicant").replace(/\s+/g, "_")}.pdf`);
   };
 
   const startOver = () => {
     setForm(emptyForm);
     setSubmitState("idle");
     setStep(0);
-    if (storageAvailable) {
-      try {
-        window.localStorage.removeItem("draft:rental-application");
-      } catch (e) { /* ignore */ }
-    }
+    draft.clear();
   };
 
   const canSubmit =
-    form.fullName &&
-    form.signerEmail &&
-    form.agreeToSign &&
-    form.typedSignature.trim().length > 1;
+    form.fullName && form.signerEmail && form.agreeToSign && form.typedSignature.trim().length > 1;
 
-  // ---------- Success screen ----------
   if (submitState === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: PALEGREY }}>
-        <div className="max-w-md w-full bg-white rounded-xl border p-8 text-center" style={{ borderColor: LIGHTGREY }}>
-          <CheckCircle2 size={44} style={{ color: CHARCOAL }} className="mx-auto mb-4" />
-          <h1 className="text-xl font-bold mb-2" style={{ color: CHARCOAL }}>Application submitted</h1>
-          <p className="text-[14px] mb-4" style={{ color: SLATE }}>{resultMessage}</p>
-          {resultLink && (
-            <a
-              href={resultLink} target="_blank" rel="noreferrer"
-              className="inline-block mb-4 text-[14px] font-semibold underline"
-              style={{ color: CHARCOAL }}
-            >
-              View document in Google Drive
-            </a>
-          )}
-          <p className="text-[13px] mb-6" style={{ color: MIDGREY }}>
-            A copy has been sent to {form.signerEmail} and {ORG_EMAIL}.
-          </p>
-          <div className="flex flex-col gap-2">
-            <button onClick={downloadCopy} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[14px] font-semibold border" style={{ borderColor: LIGHTGREY, color: CHARCOAL }}>
-              <Download size={16} /> Download a copy
-            </button>
-            <button onClick={startOver} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[14px] font-semibold text-white" style={{ backgroundColor: CHARCOAL }}>
-              <RotateCcw size={16} /> Start a new application
-            </button>
-          </div>
-        </div>
-      </div>
+      <SuccessScreen
+        resultMessage={resultMessage}
+        resultLink={resultLink}
+        signerEmail={form.signerEmail}
+        onDownload={downloadCopy}
+        onStartOver={startOver}
+      />
     );
   }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALEGREY }}>
-      {/* Header */}
-      <div className="bg-white border-b" style={{ borderColor: LIGHTGREY }}>
-        <div className="max-w-2xl mx-auto px-5 py-5">
-          <p className="text-[12px] font-bold tracking-[0.15em] mb-1" style={{ color: MIDGREY }}>IJAM HOUSING</p>
-          <h1 className="text-2xl font-bold" style={{ color: CHARCOAL }}>Rental Application</h1>
-          {restoredNotice && (
-            <p className="text-[12px] mt-1" style={{ color: MIDGREY }}>Your previous progress was restored.</p>
-          )}
-        </div>
-        {/* Progress */}
-        <div className="max-w-2xl mx-auto px-5 pb-4 flex gap-1">
-          {STEPS.map((s, i) => (
-            <div key={s.key} className="h-1 flex-1 rounded-full" style={{ backgroundColor: i <= step ? CHARCOAL : LIGHTGREY }} />
-          ))}
-        </div>
-      </div>
+      <AppHeader eyebrow="IJAM HOUSING" title="Rental Application" step={step} totalSteps={STEPS.length} restoredNotice={draft.restoredNotice} />
 
       <div className="max-w-2xl mx-auto px-5 py-6">
         <div className="flex items-center gap-2 mb-6">
@@ -474,14 +195,11 @@ By signing, the applicant certified that all information provided is true and co
         </div>
 
         <div className="bg-white rounded-xl border p-5 sm:p-6" style={{ borderColor: LIGHTGREY }}>
-
           {STEPS[step].key === "property" && (
             <>
               <SectionHeading num="1" title="Property Applied For" />
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Property Address" span={2} required>
-                  <TextInput value={form.propertyAddress} onChange={set("propertyAddress")} placeholder="123 Main St, Nashville, TN" />
-                </Field>
+                <Field label="Property Address" span={2} required><TextInput value={form.propertyAddress} onChange={set("propertyAddress")} placeholder="123 Main St, Nashville, TN" /></Field>
                 <Field label="Unit / Apt No."><TextInput value={form.unitNo} onChange={set("unitNo")} /></Field>
                 <Field label="Desired Move-In Date"><TextInput type="date" value={form.moveInDate} onChange={set("moveInDate")} /></Field>
                 <Field label="Monthly Rent"><TextInput value={form.monthlyRent} onChange={set("monthlyRent")} placeholder="$" /></Field>
@@ -494,9 +212,7 @@ By signing, the applicant certified that all information provided is true and co
             <>
               <SectionHeading num="2" title="Applicant Information" />
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Full Legal Name" span={2} required>
-                  <TextInput value={form.fullName} onChange={set("fullName")} />
-                </Field>
+                <Field label="Full Legal Name" span={2} required><TextInput value={form.fullName} onChange={set("fullName")} /></Field>
                 <Field label="Date of Birth"><TextInput type="date" value={form.dob} onChange={set("dob")} /></Field>
                 <Field label="Social Security No."><TextInput value={form.ssn} onChange={set("ssn")} placeholder="XXX-XX-XXXX" /></Field>
                 <Field label="Phone" required><TextInput type="tel" value={form.phone} onChange={set("phone")} /></Field>
@@ -572,19 +288,17 @@ By signing, the applicant certified that all information provided is true and co
               <div className="flex flex-col gap-5">
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-[14px]" style={{ color: INK }}>Ever evicted, or broken a lease?</span>
-                  <YesNo value={form.evicted} onChange={(v) => setForm((f) => ({ ...f, evicted: v }))} />
+                  <YesNo value={form.evicted} onChange={(v) => setForm((f) => { const n = { ...f, evicted: v }; draft.save(n); return n; })} />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-[14px]" style={{ color: INK }}>Ever filed for bankruptcy?</span>
-                  <YesNo value={form.bankruptcy} onChange={(v) => setForm((f) => ({ ...f, bankruptcy: v }))} />
+                  <YesNo value={form.bankruptcy} onChange={(v) => setForm((f) => { const n = { ...f, bankruptcy: v }; draft.save(n); return n; })} />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-[14px]" style={{ color: INK }}>Ever convicted of a felony?</span>
-                  <YesNo value={form.felony} onChange={(v) => setForm((f) => ({ ...f, felony: v }))} />
+                  <YesNo value={form.felony} onChange={(v) => setForm((f) => { const n = { ...f, felony: v }; draft.save(n); return n; })} />
                 </div>
-                <Field label="If yes to any of the above, please explain">
-                  <TextArea value={form.explanation} onChange={set("explanation")} />
-                </Field>
+                <Field label="If yes to any of the above, please explain"><TextArea value={form.explanation} onChange={set("explanation")} /></Field>
               </div>
             </>
           )}
@@ -605,33 +319,18 @@ By signing, the applicant certified that all information provided is true and co
           {STEPS[step].key === "sign" && (
             <>
               <SectionHeading num="10" title="Review & Sign" />
-              <div className="mb-6 p-4 rounded-md text-[13px] leading-relaxed" style={{ backgroundColor: PALEGREY, color: SLATE }}>
-                <span className="font-bold italic" style={{ color: SLATE }}>In plain terms: </span>
-                <span className="italic">Signing below confirms everything you entered is true and complete, and that you agree to a background and credit check.</span>
-              </div>
+              <Callout>Signing below confirms everything you entered is true and complete, and that you agree to a background and credit check.</Callout>
 
               <Field label="Email to send your signed copy to" required>
                 <TextInput type="email" value={form.signerEmail} onChange={set("signerEmail")} placeholder="you@email.com" />
               </Field>
 
-              <div className="mt-5 mb-1 flex items-center gap-1.5">
-                <Type size={14} color={SLATE} />
-                <span className="text-[13px] font-semibold" style={{ color: SLATE }}>Your signature</span>
+              <div className="mt-5">
+                <SignatureField value={form.typedSignature} onChange={set("typedSignature")} />
               </div>
-              <Field label="Type your full legal name as your signature" required>
-                <input
-                  value={form.typedSignature}
-                  onChange={set("typedSignature")}
-                  placeholder="Your full name"
-                  className="w-full rounded-md border px-3 py-3 text-2xl outline-none"
-                  style={{ fontFamily: "'Brush Script MT', cursive", borderColor: LIGHTGREY, color: INK }}
-                />
-              </Field>
 
               <div className="mt-4">
-                <Field label="Date">
-                  <TextInput type="date" value={form.signatureDate || todayStr()} onChange={set("signatureDate")} />
-                </Field>
+                <Field label="Date"><TextInput type="date" value={form.signatureDate || todayStr()} onChange={set("signatureDate")} /></Field>
               </div>
 
               <label className="flex items-start gap-3 mt-5 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
@@ -641,69 +340,16 @@ By signing, the applicant certified that all information provided is true and co
                 </span>
               </label>
 
-              {submitState === "error" && (
-                <div className="mt-5 p-4 rounded-md flex gap-3" style={{ backgroundColor: "#F5F0EE" }}>
-                  <AlertTriangle size={18} style={{ color: SLATE, flexShrink: 0 }} />
-                  <div>
-                    <p className="text-[13px]" style={{ color: INK }}>{resultMessage}</p>
-                    <button onClick={downloadCopy} className="text-[13px] font-semibold underline mt-2" style={{ color: CHARCOAL }}>
-                      Download a copy now
-                    </button>
-                  </div>
-                </div>
-              )}
+              {submitState === "error" && <SubmitErrorBox message={resultMessage} onDownload={downloadCopy} />}
 
-              <button
-                onClick={handleSubmit}
-                disabled={!canSubmit || submitState === "sending"}
-                className="mt-6 w-full flex items-center justify-center gap-2 py-3.5 rounded-md text-[15px] font-bold text-white transition-opacity"
-                style={{ backgroundColor: CHARCOAL, opacity: !canSubmit ? 0.4 : 1 }}
-              >
-                {submitState === "sending" ? (
-                  <><Loader2 size={18} className="animate-spin" /> Sending to Google Drive…</>
-                ) : (
-                  <><PenLine size={18} /> Sign & Submit Application</>
-                )}
-              </button>
+              <SubmitButton canSubmit={canSubmit} submitState={submitState} onClick={handleSubmit} label="Sign & Submit Application" />
             </>
           )}
         </div>
 
-        {/* Nav buttons */}
-        {!isSignStep && (
-          <div className="flex justify-between mt-5">
-            <button
-              onClick={() => canGoBack && setStep((s) => s - 1)}
-              disabled={!canGoBack}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[14px] font-semibold border"
-              style={{ borderColor: LIGHTGREY, color: canGoBack ? CHARCOAL : LIGHTGREY }}
-            >
-              <ChevronLeft size={16} /> Back
-            </button>
-            <button
-              onClick={() => canGoNext && setStep((s) => s + 1)}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-md text-[14px] font-semibold text-white"
-              style={{ backgroundColor: CHARCOAL }}
-            >
-              Next <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
-        {isSignStep && (
-          <div className="flex justify-start mt-5">
-            <button
-              onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[14px] font-semibold border"
-              style={{ borderColor: LIGHTGREY, color: CHARCOAL }}
-            >
-              <ChevronLeft size={16} /> Back
-            </button>
-          </div>
-        )}
+        <NavButtons canGoBack={canGoBack} onBack={() => setStep((s) => s - 1)} onNext={() => canGoNext && setStep((s) => s + 1)} isLastStep={isSignStep} />
 
-        <p className="text-center text-[12px] mt-6" style={{ color: MIDGREY }}>
-          Your progress is saved automatically in this browser as you go.
-        </p>
+        <p className="text-center text-[12px] mt-6" style={{ color: MIDGREY }}>Your progress is saved automatically in this browser as you go.</p>
       </div>
     </div>
   );

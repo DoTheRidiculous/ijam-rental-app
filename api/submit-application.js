@@ -1,22 +1,3 @@
-// api/submit-application.js
-//
-// Vercel serverless function. Receives the filled-in application from the
-// browser, creates a Google Doc with that content in a shared Drive folder
-// (using a service account — no per-applicant Google login required), then
-// shares that doc with the applicant and the org email. Google's own share
-// notification is what sends the "you've been shared a document" email to
-// both people — no separate email service needed.
-//
-// Required environment variables (set these in the Vercel dashboard, never
-// commit them to the repo):
-//   GOOGLE_SERVICE_ACCOUNT_KEY_BASE64  - the service account JSON key file,
-//                                        base64-encoded into one line
-//   DRIVE_FOLDER_ID                    - the Drive folder (shared with the
-//                                        service account) where submissions
-//                                        should be created
-//   ORG_EMAIL                          - your org's notification email
-//                                        (e.g. Ijamhousing@gmail.com)
-
 import { google } from "googleapis";
 
 function isValidEmail(email) {
@@ -30,7 +11,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { docTitle, docText, signerEmail } = req.body || {};
+    const { docTitle, docText, signerEmail, shareMessage } = req.body || {};
 
     if (!docTitle || !docText) {
       res.status(400).json({ error: "Missing document title or content." });
@@ -78,7 +59,7 @@ export default async function handler(req, res) {
       await drive.permissions.create({
         fileId: docId,
         sendNotificationEmail: true,
-        emailMessage: "Attached is the completed and signed Rental Application.",
+        emailMessage: shareMessage || "Attached is your completed and signed document.",
         requestBody: { type: "user", role: "commenter", emailAddress: email },
       });
     }
