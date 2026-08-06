@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { jsPDF } from "jspdf";
 import {
   Home, User, Building2, Briefcase, Users, ShieldCheck, DollarSign,
   PenLine, ChevronLeft, ChevronRight, CheckCircle2, Loader2, AlertTriangle,
@@ -319,13 +320,80 @@ By signing, the applicant certified that all information provided is true and co
   };
 
   const downloadCopy = () => {
-    const blob = new Blob([buildDocumentText()], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Rental_Application_${(form.fullName || "applicant").replace(/\s+/g, "_")}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const doc = new jsPDF({ unit: "pt", format: "letter" });
+    const marginL = 56;
+    const marginR = 56;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const contentWidth = pageWidth - marginL - marginR;
+    let y = 64;
+
+    const CHARCOAL_RGB = [43, 43, 43];
+    const SLATE_RGB = [89, 89, 89];
+    const INK_RGB = [26, 26, 26];
+    const LIGHTGREY_RGB = [217, 217, 217];
+
+    const ensureSpace = (needed) => {
+      if (y + needed > pageHeight - 56) {
+        doc.addPage();
+        y = 64;
+      }
+    };
+
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(...CHARCOAL_RGB);
+    doc.text("RENTAL APPLICATION", marginL, y);
+    y += 18;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
+    doc.setTextColor(...SLATE_RGB);
+    doc.text(`Submitted: ${new Date().toLocaleString()}`, marginL, y);
+    y += 10;
+    doc.setDrawColor(...CHARCOAL_RGB);
+    doc.setLineWidth(1.4);
+    doc.line(marginL, y, pageWidth - marginR, y);
+    y += 22;
+
+    const lines = buildDocumentText().split("\n");
+    lines.forEach((rawLine) => {
+      const line = rawLine.trimEnd();
+      const isSectionHeader = /^\d+\.\s[A-Z& ]+$/.test(line);
+      const isBlank = line.trim().length === 0;
+
+      if (isBlank) {
+        y += 8;
+        return;
+      }
+
+      if (isSectionHeader) {
+        ensureSpace(26);
+        y += 10;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11.5);
+        doc.setTextColor(...CHARCOAL_RGB);
+        doc.text(line, marginL, y);
+        y += 4;
+        doc.setDrawColor(...LIGHTGREY_RGB);
+        doc.setLineWidth(0.75);
+        doc.line(marginL, y + 4, pageWidth - marginR, y + 4);
+        y += 16;
+        return;
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK_RGB);
+      const wrapped = doc.splitTextToSize(line, contentWidth);
+      wrapped.forEach((wLine) => {
+        ensureSpace(14);
+        doc.text(wLine, marginL, y);
+        y += 14;
+      });
+    });
+
+    doc.save(`Rental_Application_${(form.fullName || "applicant").replace(/\s+/g, "_")}.pdf`);
   };
 
   const startOver = () => {
