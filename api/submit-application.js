@@ -19,12 +19,6 @@
 
 import { google } from "googleapis";
 
-function getServiceAccountCredentials() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-  if (!raw) throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_KEY environment variable.");
-  return JSON.parse(raw);
-}
-
 function isValidEmail(email) {
   return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -51,15 +45,16 @@ export default async function handler(req, res) {
     const folderId = process.env.DRIVE_FOLDER_ID;
     if (!orgEmail) throw new Error("Missing ORG_EMAIL environment variable.");
     if (!folderId) throw new Error("Missing DRIVE_FOLDER_ID environment variable.");
+    if (!process.env.GOOGLE_REFRESH_TOKEN) throw new Error("Missing GOOGLE_REFRESH_TOKEN environment variable.");
 
-    const credentials = getServiceAccountCredentials();
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/drive"],
-    });
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    );
+    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
 
-    const drive = google.drive({ version: "v3", auth });
-    const docs = google.docs({ version: "v1", auth });
+    const drive = google.drive({ version: "v3", auth: oauth2Client });
+    const docs = google.docs({ version: "v1", auth: oauth2Client });
 
     const file = await drive.files.create({
       requestBody: {
