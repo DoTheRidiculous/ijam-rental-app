@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const LINKS = [
@@ -35,6 +35,21 @@ export default function Landing() {
             </a>
           ))}
         </div>
+
+        <a
+          href="/create-link"
+          className="flex items-center gap-4 bg-white border rounded-xl p-5 mt-3 transition-shadow hover:shadow-sm"
+          style={{ borderColor: LIGHTGREY }}
+        >
+          <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: PALEGREY }}>
+            <Link2 size={20} color={CHARCOAL} />
+          </div>
+          <div className="flex-1">
+            <p className="text-[16px] font-bold" style={{ color: CHARCOAL }}>Create a Pre-Filled Link</p>
+            <p className="text-[13px]" style={{ color: SLATE }}>For staff — build a link with a few fields already filled in for a specific tenant.</p>
+          </div>
+          <ArrowRight size={18} color={MIDGREY} />
+        </a>
       </div>
     </div>
   );

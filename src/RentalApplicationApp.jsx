@@ -32,6 +32,19 @@ const emptyForm = {
   signerEmail: "",
 };
 
+// Query params a link can pre-fill, e.g. ?address=123+Main+St&rent=1200&tenant=Jane+Doe&email=jane@email.com
+const QUERY_MAP = [
+  ["address", "propertyAddress"],
+  ["unit", "unitNo"],
+  ["movein", "moveInDate"],
+  ["rent", "monthlyRent"],
+  ["term", "leaseTermRequested"],
+  ["tenant", "fullName"],
+  ["phone", "phone"],
+  ["email", "email"],
+  ["email", "signerEmail"],
+];
+
 function RentalApplicationForm() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(emptyForm);
@@ -39,7 +52,7 @@ function RentalApplicationForm() {
   const [resultMessage, setResultMessage] = useState("");
   const [resultLink, setResultLink] = useState(null);
 
-  const draft = useDraftStorage("draft:rental-application", emptyForm, setForm);
+  const draft = useDraftStorage("draft:rental-application", emptyForm, setForm, QUERY_MAP);
 
   const set = (key) => (e) => {
     const val = e && e.target ? (e.target.type === "checkbox" ? e.target.checked : e.target.value) : e;
@@ -184,7 +197,7 @@ By signing, the applicant certified that all information provided is true and co
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALEGREY }}>
-      <AppHeader eyebrow="IJAM HOUSING" title="Rental Application" step={step} totalSteps={STEPS.length} restoredNotice={draft.restoredNotice} />
+      <AppHeader eyebrow="IJAM HOUSING" title="Rental Application" step={step} totalSteps={STEPS.length} noticeText={draft.noticeText} />
 
       <div className="max-w-2xl mx-auto px-5 py-6">
         <div className="flex items-center gap-2 mb-6">

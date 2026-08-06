@@ -128,12 +128,35 @@ export class ErrorBoundary extends React.Component {
   }
 }
 
-// ---------- Draft autosave (localStorage) ----------
-export function useDraftStorage(storageKey, emptyForm, setForm) {
+// ---------- Draft autosave (localStorage) + link prefill ----------
+// queryFieldMap: array of [queryParamKey, formFieldKey] pairs. A query key can
+// map to more than one form field (e.g. ?email= filling both a contact email
+// and the signer email).
+export function useDraftStorage(storageKey, emptyForm, setForm, queryFieldMap) {
   const [restoredNotice, setRestoredNotice] = useState(false);
+  const [prefilledNotice, setPrefilledNotice] = useState(false);
   const storageAvailable = typeof window !== "undefined" && !!window.localStorage;
 
   useEffect(() => {
+    // 1. A prefilled link takes priority over any old draft in this browser.
+    if (queryFieldMap && queryFieldMap.length && typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const seed = {};
+      let matched = false;
+      queryFieldMap.forEach(([queryKey, formKey]) => {
+        const v = params.get(queryKey);
+        if (v) {
+          seed[formKey] = v;
+          matched = true;
+        }
+      });
+      if (matched) {
+        setForm((f) => ({ ...f, ...seed }));
+        setPrefilledNotice(true);
+        return;
+      }
+    }
+    // 2. Otherwise, restore any saved draft for this browser/device.
     if (!storageAvailable) return;
     try {
       const raw = window.localStorage.getItem(storageKey);
@@ -159,7 +182,13 @@ export function useDraftStorage(storageKey, emptyForm, setForm) {
     } catch (e) { /* ignore */ }
   };
 
-  return { restoredNotice, save, clear, storageAvailable };
+  const noticeText = prefilledNotice
+    ? "Some details were pre-filled for you — double check them before submitting."
+    : restoredNotice
+    ? "Your previous progress was restored."
+    : null;
+
+  return { restoredNotice, prefilledNotice, noticeText, save, clear, storageAvailable };
 }
 
 // ---------- PDF export ----------
@@ -252,13 +281,13 @@ export async function submitToDrive({ docTitle, docText, signerEmail, shareMessa
 }
 
 // ---------- Layout shell ----------
-export function AppHeader({ eyebrow, title, step, totalSteps, restoredNotice }) {
+export function AppHeader({ eyebrow, title, step, totalSteps, noticeText }) {
   return (
     <div className="bg-white border-b" style={{ borderColor: LIGHTGREY }}>
       <div className="max-w-2xl mx-auto px-5 py-5">
         <p className="text-[12px] font-bold tracking-[0.15em] mb-1" style={{ color: MIDGREY }}>{eyebrow}</p>
         <h1 className="text-2xl font-bold" style={{ color: CHARCOAL }}>{title}</h1>
-        {restoredNotice && <p className="text-[12px] mt-1" style={{ color: MIDGREY }}>Your previous progress was restored.</p>}
+        {noticeText && <p className="text-[12px] mt-1" style={{ color: MIDGREY }}>{noticeText}</p>}
       </div>
       <div className="max-w-2xl mx-auto px-5 pb-4 flex gap-1">
         {Array.from({ length: totalSteps }).map((_, i) => (
