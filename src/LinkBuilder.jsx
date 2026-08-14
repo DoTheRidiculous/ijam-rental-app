@@ -47,6 +47,15 @@ const DOC_TYPES = [
       { key: "email", label: "Tenant Email" },
     ],
   },
+  {
+    key: "move-in-questionnaire",
+    label: "Move-In Questionnaire",
+    path: "/move-in-questionnaire",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
 ];
 
 export default function LinkBuilder() {

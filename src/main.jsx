@@ -6,6 +6,7 @@ import LinkBuilder from "./LinkBuilder.jsx";
 import RentalApplicationApp from "./RentalApplicationApp.jsx";
 import AgreementToLeaseApp from "./AgreementToLeaseApp.jsx";
 import ResidentialLeaseApp from "./ResidentialLeaseApp.jsx";
+import MoveInQuestionnaireApp from "./MoveInQuestionnaireApp.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/rental-application" element={<RentalApplicationApp />} />
         <Route path="/agreement-to-lease" element={<AgreementToLeaseApp />} />
         <Route path="/residential-lease" element={<ResidentialLeaseApp />} />
+        <Route path="/move-in-questionnaire" element={<MoveInQuestionnaireApp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -87,6 +87,31 @@ export function SectionHeading({ num, title }) {
   );
 }
 
+export function MultiSelect({ options, selected, onToggle }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const active = selected.includes(opt);
+        return (
+          <button
+            type="button"
+            key={opt}
+            onClick={() => onToggle(opt)}
+            className="px-3 py-1.5 rounded-full text-[13px] font-medium border transition-colors"
+            style={
+              active
+                ? { backgroundColor: CHARCOAL, color: "#fff", borderColor: CHARCOAL }
+                : { backgroundColor: "#fff", color: SLATE, borderColor: LIGHTGREY }
+            }
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function Callout({ children }) {
   return (
     <div className="mb-6 p-4 rounded-md text-[13px] leading-relaxed" style={{ backgroundColor: PALEGREY, color: SLATE }}>
@@ -231,7 +256,7 @@ export function downloadDocumentPdf({ title, subtitle, docText, fileName }) {
   const lines = docText.split("\n");
   lines.forEach((rawLine) => {
     const line = rawLine.trimEnd();
-    const isSectionHeader = /^\d+\.\s[A-Z& ]+$/.test(line);
+    const isSectionHeader = /^\d+\.\s[A-Z0-9&\-/ ]+$/.test(line);
     const isBlank = line.trim().length === 0;
 
     if (isBlank) {
