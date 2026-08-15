@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const LINKS = [
@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/agreement-to-lease", title: "Agreement to Lease", desc: "Reserve a unit ahead of the full lease signing.", icon: FileSignature },
   { href: "/residential-lease", title: "Residential Lease", desc: "The full lease agreement for move-in.", icon: HomeIcon },
   { href: "/move-in-questionnaire", title: "Move-In & Storage Questionnaire", desc: "Plan move-in timing, furniture, and storage needs.", icon: Boxes },
+  { href: "/item-photos", title: "Item Photos", desc: "Upload photos of furniture and belongings for us to view.", icon: Camera },
 ];
 
 export default function Landing() {

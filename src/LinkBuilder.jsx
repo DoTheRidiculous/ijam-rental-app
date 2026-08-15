@@ -56,6 +56,15 @@ const DOC_TYPES = [
       { key: "email", label: "Tenant Email" },
     ],
   },
+  {
+    key: "item-photos",
+    label: "Item Photos",
+    path: "/item-photos",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
 ];
 
 export default function LinkBuilder() {
