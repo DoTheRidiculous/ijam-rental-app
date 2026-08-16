@@ -1,12 +1,16 @@
 // api/create-photo-folder.js
 //
-// Creates a new folder in Drive to hold a set of item photos, sets it to
-// "anyone with the link can view" (no Google login required to view it),
-// and optionally shares it directly with the respondent + org email too.
-// Returns the folder's id (for uploading photos into) and its shareable link.
+// Finds an existing photo folder for this person (by name) and reuses it,
+// or creates a new one if this is their first time. This means she can come
+// back and upload more photos anytime using the same link, and everything
+// lands in one folder instead of scattering across duplicates.
 
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
+
+function escapeForDriveQuery(str) {
+  return str.replace(/[\\']/g, "\\$&");
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -15,9 +19,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { folderTitle, signerEmail } = req.body || {};
-    if (!folderTitle) {
-      res.status(400).json({ error: "Missing folder title." });
+    const { respondentName, signerEmail } = req.body || {};
+    const name = (respondentName || "").trim();
+    if (!name) {
+      res.status(400).json({ error: "Missing respondent name." });
       return;
     }
 
@@ -29,39 +34,60 @@ export default async function handler(req, res) {
     const auth = getOAuthClient();
     const drive = google.drive({ version: "v3", auth });
 
-    const folder = await drive.files.create({
-      requestBody: {
-        name: folderTitle,
-        mimeType: "application/vnd.google-apps.folder",
-        parents: [parentFolderId],
-      },
-      fields: "id, webViewLink",
-    });
-    const folderId = folder.data.id;
+    const folderTitle = `Item Photos - ${name}`;
+    const safeTitle = escapeForDriveQuery(folderTitle);
 
-    // Make it viewable by anyone with the link — no Google account needed.
-    await drive.permissions.create({
-      fileId: folderId,
-      requestBody: { type: "anyone", role: "reader" },
+    // Reuse an existing folder for this person if one already exists.
+    // Matching is case-insensitive since "contains" is used, then verified.
+    const existing = await drive.files.list({
+      q: `'${parentFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false and name contains '${safeTitle}'`,
+      fields: "files(id, name, webViewLink)",
+      pageSize: 10,
     });
 
-    // Also share directly with the org and, if provided, the respondent —
-    // this triggers a normal Drive notification email as a courtesy record.
-    const recipients = [orgEmail, ...(isValidEmail(signerEmail) ? [signerEmail] : [])];
-    for (const email of recipients) {
-      try {
-        await drive.permissions.create({
-          fileId: folderId,
-          sendNotificationEmail: true,
-          emailMessage: "Photos are being uploaded to this shared folder.",
-          requestBody: { type: "user", role: "reader", emailAddress: email },
-        });
-      } catch (e) {
-        // Non-fatal — the folder is already public-viewable regardless.
+    const match = (existing.data.files || []).find(
+      (f) => f.name.trim().toLowerCase() === folderTitle.trim().toLowerCase()
+    );
+
+    let folderId, link;
+
+    if (match) {
+      folderId = match.id;
+      link = match.webViewLink;
+    } else {
+      const folder = await drive.files.create({
+        requestBody: {
+          name: folderTitle,
+          mimeType: "application/vnd.google-apps.folder",
+          parents: [parentFolderId],
+        },
+        fields: "id, webViewLink",
+      });
+      folderId = folder.data.id;
+      link = folder.data.webViewLink;
+
+      // Only needs to be set once — make it viewable by anyone with the link.
+      await drive.permissions.create({
+        fileId: folderId,
+        requestBody: { type: "anyone", role: "reader" },
+      });
+
+      const recipients = [orgEmail, ...(isValidEmail(signerEmail) ? [signerEmail] : [])];
+      for (const email of recipients) {
+        try {
+          await drive.permissions.create({
+            fileId: folderId,
+            sendNotificationEmail: true,
+            emailMessage: "Photos are being uploaded to this shared folder.",
+            requestBody: { type: "user", role: "reader", emailAddress: email },
+          });
+        } catch (e) {
+          // Non-fatal — the folder is already public-viewable regardless.
+        }
       }
     }
 
-    res.status(200).json({ success: true, folderId, link: folder.data.webViewLink });
+    res.status(200).json({ success: true, folderId, link });
   } catch (err) {
     console.error("create-photo-folder error:", err);
     res.status(500).json({ error: err.message || "Something went wrong creating the photo folder." });

@@ -65,6 +65,15 @@ const DOC_TYPES = [
       { key: "email", label: "Tenant Email" },
     ],
   },
+  {
+    key: "storage-donation-consent",
+    label: "Storage & Donation Consent",
+    path: "/storage-donation-consent",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
 ];
 
 export default function LinkBuilder() {

@@ -294,8 +294,8 @@ export function downloadDocumentPdf({ title, subtitle, docText, fileName }) {
 }
 
 // ---------- Drive submission ----------
-export async function submitToDrive({ docTitle, docText, signerEmail, shareMessage }) {
-  const response = await fetch("/api/submit-application", {
+export async function submitToDrive({ docTitle, docText, signerEmail, shareMessage, endpoint = "/api/submit-application" }) {
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ docTitle, docText, signerEmail, shareMessage }),

@@ -8,6 +8,8 @@ import AgreementToLeaseApp from "./AgreementToLeaseApp.jsx";
 import ResidentialLeaseApp from "./ResidentialLeaseApp.jsx";
 import MoveInQuestionnaireApp from "./MoveInQuestionnaireApp.jsx";
 import PhotoUploadApp from "./PhotoUploadApp.jsx";
+import FindPhotos from "./FindPhotos.jsx";
+import StorageDonationConsentApp from "./StorageDonationConsentApp.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -21,6 +23,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/residential-lease" element={<ResidentialLeaseApp />} />
         <Route path="/move-in-questionnaire" element={<MoveInQuestionnaireApp />} />
         <Route path="/item-photos" element={<PhotoUploadApp />} />
+        <Route path="/find-photos" element={<FindPhotos />} />
+        <Route path="/storage-donation-consent" element={<StorageDonationConsentApp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

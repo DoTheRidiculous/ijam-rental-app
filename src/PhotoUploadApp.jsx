@@ -77,11 +77,10 @@ export default function PhotoUploadApp() {
     setProgress({ done: 0, total: photos.length });
 
     try {
-      const folderTitle = `Item Photos - ${form.respondentName} - ${todayStr()}`;
       const folderRes = await fetch("/api/create-photo-folder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderTitle, signerEmail: form.respondentEmail }),
+        body: JSON.stringify({ respondentName: form.respondentName, signerEmail: form.respondentEmail }),
       });
       const folderData = await folderRes.json();
       if (!folderRes.ok) throw new Error(folderData.error || "Could not create the photo folder.");
@@ -90,7 +89,7 @@ export default function PhotoUploadApp() {
         const photo = photos[i];
         const compressed = await compressImage(photo.file);
         const safeLabel = (photo.label || `photo-${i + 1}`).replace(/[^\w\- ]+/g, "").trim() || `photo-${i + 1}`;
-        const fileName = `${safeLabel}.jpg`;
+        const fileName = `${safeLabel} - ${todayStr()} (${Date.now()}-${i}).jpg`;
 
         const uploadRes = await fetch("/api/upload-photo", {
           method: "POST",
@@ -141,6 +140,7 @@ export default function PhotoUploadApp() {
           </div>
           <p className="text-[12px] mb-5" style={{ color: MIDGREY }}>
             This link is viewable by anyone who has it — no Google account needed. Safe to forward to anyone who needs to see the photos.
+            Forgot something? Come back to this same page anytime and upload more using the same name — they'll be added to this same folder, not a new one.
           </p>
           <div className="flex flex-col gap-2">
             <button onClick={copyLink} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[14px] font-semibold text-white" style={{ backgroundColor: CHARCOAL }}>

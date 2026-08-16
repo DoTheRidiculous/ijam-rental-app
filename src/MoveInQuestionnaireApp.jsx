@@ -3,7 +3,7 @@ import { CalendarDays, BedDouble, Sofa, Refrigerator, Boxes, ClipboardList, Ware
 import {
   ErrorBoundary, Field, TextInput, TextArea, YesNo, MultiSelect, SectionHeading, Callout,
   AppHeader, NavButtons, SuccessScreen, SubmitErrorBox, SubmitButton,
-  useDraftStorage, downloadDocumentPdf, submitToDrive, todayStr,
+  useDraftStorage, downloadDocumentPdf, submitToDrive,
   INK, CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, ORG_EMAIL,
 } from "./formKit.jsx";
 
@@ -162,16 +162,20 @@ This questionnaire is a planning tool, not a legal document. Once reviewed, we'l
     setResultMessage("");
     setResultLink(null);
     const docText = buildDocumentText();
-    const dateLabel = todayStr();
-    const docTitle = `Move-In Questionnaire - ${form.respondentName || "Respondent"} - ${dateLabel}`;
+    const docTitle = `Move-In Questionnaire - ${form.respondentName || "Respondent"}`;
 
     try {
       const data = await submitToDrive({
         docTitle, docText, signerEmail: form.respondentEmail,
         shareMessage: "Attached is the completed Move-In, Furniture & Storage Questionnaire.",
+        endpoint: "/api/submit-questionnaire",
       });
       draft.clear();
-      setResultMessage(`This questionnaire was saved and shared with ${form.respondentEmail} and ${ORG_EMAIL}.`);
+      setResultMessage(
+        data.updated
+          ? `Your existing questionnaire was updated with these answers, and a copy was shared with ${form.respondentEmail} and ${ORG_EMAIL}.`
+          : `This questionnaire was saved and shared with ${form.respondentEmail} and ${ORG_EMAIL}.`
+      );
       setResultLink(data.link || null);
       setSubmitState("success");
     } catch (err) {
@@ -356,7 +360,9 @@ This questionnaire is a planning tool, not a legal document. Once reviewed, we'l
               <SectionHeading num="9" title="Review & Submit" />
               <Callout>
                 Once we have this, we'll compare it against what's already in the apartment to figure out what to bring,
-                what's already provided, what needs storage, and the best move-in timeline.
+                what's already provided, what needs storage, and the best move-in timeline. Forgot something? Come back to
+                this same link anytime and submit again with the same name — it'll update your existing answers instead
+                of creating a duplicate.
               </Callout>
 
               <div className="grid grid-cols-2 gap-4 mb-5">
