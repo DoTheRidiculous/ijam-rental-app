@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const FORM_LINKS = [
@@ -9,11 +9,13 @@ const FORM_LINKS = [
   { href: "/move-in-questionnaire", title: "Move-In & Storage Questionnaire", desc: "Plan move-in timing, furniture, and storage needs.", icon: Boxes },
   { href: "/item-photos", title: "Item Photos", desc: "Upload photos of furniture and belongings for us to view.", icon: Camera },
   { href: "/storage-donation-consent", title: "Storage & Donation Consent", desc: "Let us know what to store or give away — no obligation created either way.", icon: Gift },
+  { href: "/move-support", title: "Move Support Request", desc: "Let us know your move dates and whether you need help or boxes.", icon: Truck },
 ];
 
 const STAFF_LINKS = [
   { href: "/create-link", title: "Create a Pre-Filled Link", desc: "Build a link with a few fields already filled in for a specific tenant.", icon: Link2 },
   { href: "/find-photos", title: "Find an Applicant's Photos", desc: "Search by name to find and re-share their photo folder link.", icon: Search },
+  { href: "/find-documents", title: "Search All Documents", desc: "Find everything on file for one person, and create a link to share it.", icon: FileSearch },
 ];
 
 function LinkCard({ href, title, desc, icon: Icon }) {

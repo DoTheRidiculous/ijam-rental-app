@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Search, Link2, Copy, Check, ArrowLeft, Camera } from "lucide-react";
-import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
+import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, useKnownNames } from "./formKit.jsx";
 
 export default function FindPhotos() {
   const [query, setQuery] = useState("");
@@ -8,6 +8,7 @@ export default function FindPhotos() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState(null);
+  const knownNames = useKnownNames();
 
   const search = async () => {
     setLoading(true);
@@ -52,9 +53,13 @@ export default function FindPhotos() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && search()}
             placeholder="Applicant name"
+            list="known-applicant-names"
             className="flex-1 rounded-md border px-3 py-2.5 text-[15px] outline-none"
             style={{ borderColor: LIGHTGREY, color: CHARCOAL, backgroundColor: "#fff" }}
           />
+          <datalist id="known-applicant-names">
+            {knownNames.map((n) => <option key={n} value={n} />)}
+          </datalist>
           <button
             onClick={search}
             disabled={loading}

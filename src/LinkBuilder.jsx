@@ -74,6 +74,15 @@ const DOC_TYPES = [
       { key: "email", label: "Tenant Email" },
     ],
   },
+  {
+    key: "move-support",
+    label: "Move Support Request",
+    path: "/move-support",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
 ];
 
 export default function LinkBuilder() {

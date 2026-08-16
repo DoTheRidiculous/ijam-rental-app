@@ -157,6 +157,21 @@ export class ErrorBoundary extends React.Component {
 // queryFieldMap: array of [queryParamKey, formFieldKey] pairs. A query key can
 // map to more than one form field (e.g. ?email= filling both a contact email
 // and the signer email).
+export function useKnownNames() {
+  const [names, setNames] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/list-known-names")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled && data && Array.isArray(data.names)) setNames(data.names);
+      })
+      .catch(() => { /* autocomplete is a nice-to-have — fail silently */ });
+    return () => { cancelled = true; };
+  }, []);
+  return names;
+}
+
 export function useDraftStorage(storageKey, emptyForm, setForm, queryFieldMap) {
   const [restoredNotice, setRestoredNotice] = useState(false);
   const [prefilledNotice, setPrefilledNotice] = useState(false);
