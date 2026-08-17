@@ -20,7 +20,7 @@ const STEPS = [
 
 const emptyForm = {
   propertyAddress: "", unitNo: "", moveInDate: "", monthlyRent: "", leaseTermRequested: "",
-  fullName: "", dob: "", ssn: "", phone: "", email: "", dlNumber: "", dlState: "", coApplicantName: "",
+  fullName: "", dob: "", ssn: "", phone: "", email: "", dlNumber: "", dlState: "", coApplicantName: "", coApplicantIncome: "",
   currAddress: "", currLandlordName: "", currLandlordPhone: "", currRent: "", currLength: "", reasonLeaving: "",
   priorAddress: "", priorLandlordName: "", priorLandlordPhone: "", priorLength: "",
   employer: "", position: "", employmentLength: "", supervisorName: "", employerPhone: "", grossIncome: "", otherIncome: "",
@@ -88,6 +88,7 @@ Email: ${f.email}
 Driver's License / State ID No.: ${f.dlNumber}
 State Issued: ${f.dlState}
 Co-Applicant Name: ${f.coApplicantName}
+Co-Applicant Gross Monthly Income: ${f.coApplicantIncome}
 
 3. CURRENT RESIDENCE
 Current Address: ${f.currAddress}
@@ -232,7 +233,8 @@ By signing, the applicant certified that all information provided is true and co
                 <Field label="Email" required><TextInput type="email" value={form.email} onChange={set("email")} /></Field>
                 <Field label="Driver's License / State ID No."><TextInput value={form.dlNumber} onChange={set("dlNumber")} /></Field>
                 <Field label="State Issued"><TextInput value={form.dlState} onChange={set("dlState")} placeholder="TN" /></Field>
-                <Field label="Co-Applicant Name (if any)" span={2}><TextInput value={form.coApplicantName} onChange={set("coApplicantName")} /></Field>
+                <Field label="Co-Applicant Name (if any)"><TextInput value={form.coApplicantName} onChange={set("coApplicantName")} /></Field>
+                <Field label="Co-Applicant Gross Monthly Income"><TextInput value={form.coApplicantIncome} onChange={set("coApplicantIncome")} placeholder="$" /></Field>
               </div>
             </>
           )}
