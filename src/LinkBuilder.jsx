@@ -83,6 +83,15 @@ const DOC_TYPES = [
       { key: "email", label: "Tenant Email" },
     ],
   },
+  {
+    key: "property-loan-agreement",
+    label: "Property Loan Agreement",
+    path: "/property-loan-agreement",
+    fields: [
+      { key: "tenant", label: "Owner Name" },
+      { key: "email", label: "Owner Email" },
+    ],
+  },
 ];
 
 export default function LinkBuilder() {

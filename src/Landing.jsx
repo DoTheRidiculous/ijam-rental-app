@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch, Package } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const FORM_LINKS = [
@@ -10,6 +10,7 @@ const FORM_LINKS = [
   { href: "/item-photos", title: "Item Photos", desc: "Upload photos of furniture and belongings for us to view.", icon: Camera },
   { href: "/storage-donation-consent", title: "Storage & Donation Consent", desc: "Let us know what to store or give away — no obligation created either way.", icon: Gift },
   { href: "/move-support", title: "Move Support Request", desc: "Let us know your move dates and whether you need help or boxes.", icon: Truck },
+  { href: "/property-loan-agreement", title: "Property Loan Agreement", desc: "Document an item loaned to IJAM Housing, with return and care terms.", icon: Package },
 ];
 
 const STAFF_LINKS = [
