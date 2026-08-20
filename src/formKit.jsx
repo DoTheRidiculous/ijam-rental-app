@@ -36,8 +36,12 @@ export function TextInput(props) {
     <input
       {...props}
       className={inputClass}
-      style={{ ...inputStyle }}
-      onFocus={(e) => (e.target.style.borderColor = CHARCOAL)}
+      style={{
+        ...inputStyle,
+        color: props.disabled ? MIDGREY : INK,
+        backgroundColor: props.disabled ? PALEGREY : "#FFFFFF",
+      }}
+      onFocus={(e) => !props.disabled && (e.target.style.borderColor = CHARCOAL)}
       onBlur={(e) => (e.target.style.borderColor = LIGHTGREY)}
     />
   );
@@ -49,8 +53,12 @@ export function TextArea(props) {
       {...props}
       rows={props.rows || 3}
       className={inputClass + " resize-none"}
-      style={{ ...inputStyle }}
-      onFocus={(e) => (e.target.style.borderColor = CHARCOAL)}
+      style={{
+        ...inputStyle,
+        color: props.disabled ? MIDGREY : INK,
+        backgroundColor: props.disabled ? PALEGREY : "#FFFFFF",
+      }}
+      onFocus={(e) => !props.disabled && (e.target.style.borderColor = CHARCOAL)}
       onBlur={(e) => (e.target.style.borderColor = LIGHTGREY)}
     />
   );
@@ -393,15 +401,21 @@ export function SuccessScreen({ resultMessage, resultLink, signerEmail, onDownlo
   );
 }
 
-export function SignatureField({ value, onChange }) {
+export function SignatureField({ value, onChange, disabled = false }) {
   return (
     <Field label="Type your full legal name as your signature" required>
       <input
         value={value}
         onChange={onChange}
+        disabled={disabled}
         placeholder="Your full name"
         className="w-full rounded-md border px-3 py-3 text-2xl outline-none"
-        style={{ fontFamily: "'Brush Script MT', cursive", borderColor: LIGHTGREY, color: INK }}
+        style={{
+          fontFamily: "'Brush Script MT', cursive",
+          borderColor: LIGHTGREY,
+          color: disabled ? MIDGREY : INK,
+          backgroundColor: disabled ? PALEGREY : "#fff",
+        }}
       />
     </Field>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Package, FileSignature, ShieldCheck, PenLine, Share2, Copy, Check } from "lucide-react";
+import { Package, FileSignature, ShieldCheck, PenLine, Share2, Copy, Check, Lock } from "lucide-react";
 import {
   ErrorBoundary, Field, TextInput, TextArea, SectionHeading, Callout,
   AppHeader, NavButtons, SuccessScreen, SignatureField, SubmitErrorBox, SubmitButton,
@@ -164,6 +164,7 @@ Note: This is a general agreement intended to document a good-faith property loa
   const ownerSectionComplete =
     form.ownerName && form.ownerEmail && form.ownerSignature.trim().length > 1 && form.ownerAck;
   const borrowerStarted = form.borrowerRepName.trim().length > 0 || form.borrowerSignature.trim().length > 0;
+  const ownerFieldsLocked = draft.prefilledNotice && ownerSectionComplete;
 
   const generateHandoffLink = () => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -216,13 +217,13 @@ Note: This is a general agreement intended to document a good-faith property loa
               <Callout>This documents exactly what's being loaned and its condition, so there's no confusion later about what was loaned or what shape it was in.</Callout>
               <div className="flex flex-col gap-5">
                 <Field label="Item(s) being loaned" required>
-                  <TextArea value={form.itemDescription} onChange={set("itemDescription")} rows={2} placeholder="e.g. Washer and dryer" />
+                  <TextArea value={form.itemDescription} onChange={set("itemDescription")} rows={2} placeholder="e.g. Washer and dryer" disabled={ownerFieldsLocked} />
                 </Field>
                 <Field label="Condition / known issues at time of loan">
-                  <TextArea value={form.itemCondition} onChange={set("itemCondition")} rows={3} placeholder="Note any existing dents, wear, or issues" />
+                  <TextArea value={form.itemCondition} onChange={set("itemCondition")} rows={3} placeholder="Note any existing dents, wear, or issues" disabled={ownerFieldsLocked} />
                 </Field>
                 <Field label="Estimated value (for repair/replacement reference)">
-                  <TextInput value={form.estimatedValue} onChange={set("estimatedValue")} placeholder="$" />
+                  <TextInput value={form.estimatedValue} onChange={set("estimatedValue")} placeholder="$" disabled={ownerFieldsLocked} />
                 </Field>
               </div>
             </>
@@ -232,13 +233,13 @@ Note: This is a general agreement intended to document a good-faith property loa
             <>
               <SectionHeading num="2" title="Loan Terms" />
               <div className="flex flex-col gap-5">
-                <Field label="Purpose of loan"><TextInput value={form.loanPurpose} onChange={set("loanPurpose")} placeholder="e.g. For use during tenant's housing arrangement" /></Field>
-                <Field label="Loan start date"><TextInput type="date" value={form.loanStartDate} onChange={set("loanStartDate")} /></Field>
+                <Field label="Purpose of loan"><TextInput value={form.loanPurpose} onChange={set("loanPurpose")} placeholder="e.g. For use during tenant's housing arrangement" disabled={ownerFieldsLocked} /></Field>
+                <Field label="Loan start date"><TextInput type="date" value={form.loanStartDate} onChange={set("loanStartDate")} disabled={ownerFieldsLocked} /></Field>
                 <Field label="Return notice terms">
-                  <TextArea value={form.returnNoticeTerms} onChange={set("returnNoticeTerms")} rows={2} placeholder="e.g. Owner will give 2 weeks' notice before requesting return" />
+                  <TextArea value={form.returnNoticeTerms} onChange={set("returnNoticeTerms")} rows={2} placeholder="e.g. Owner will give 2 weeks' notice before requesting return" disabled={ownerFieldsLocked} />
                 </Field>
                 <Field label="Who handles pickup/delivery and transport costs">
-                  <TextArea value={form.transportResponsibility} onChange={set("transportResponsibility")} rows={2} />
+                  <TextArea value={form.transportResponsibility} onChange={set("transportResponsibility")} rows={2} disabled={ownerFieldsLocked} />
                 </Field>
               </div>
             </>
@@ -256,7 +257,7 @@ Note: This is a general agreement intended to document a good-faith property loa
                 ))}
               </div>
               <Field label="Any special care instructions from the Owner?">
-                <TextArea value={form.specialCareInstructions} onChange={set("specialCareInstructions")} rows={3} />
+                <TextArea value={form.specialCareInstructions} onChange={set("specialCareInstructions")} rows={3} disabled={ownerFieldsLocked} />
               </Field>
             </>
           )}
@@ -267,15 +268,23 @@ Note: This is a general agreement intended to document a good-faith property loa
               <Callout>Both the Owner and an IJAM Housing representative sign below to confirm this agreement.</Callout>
 
               <p className="text-[13px] font-bold mb-3" style={{ color: SLATE }}>OWNER</p>
+              {ownerFieldsLocked && (
+                <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-md" style={{ backgroundColor: PALEGREY }}>
+                  <Lock size={13} color={MIDGREY} />
+                  <span className="text-[12px]" style={{ color: MIDGREY }}>
+                    This section was already signed by the Owner and can't be changed here.
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <Field label="Owner's Name" required><TextInput value={form.ownerName} onChange={set("ownerName")} /></Field>
-                <Field label="Owner's Email" required><TextInput type="email" value={form.ownerEmail} onChange={set("ownerEmail")} /></Field>
+                <Field label="Owner's Name" required><TextInput value={form.ownerName} onChange={set("ownerName")} disabled={ownerFieldsLocked} /></Field>
+                <Field label="Owner's Email" required><TextInput type="email" value={form.ownerEmail} onChange={set("ownerEmail")} disabled={ownerFieldsLocked} /></Field>
               </div>
               <div className="mb-4">
-                <SignatureField value={form.ownerSignature} onChange={set("ownerSignature")} />
+                <SignatureField value={form.ownerSignature} onChange={set("ownerSignature")} disabled={ownerFieldsLocked} />
               </div>
-              <label className="flex items-start gap-3 mb-6 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
-                <input type="checkbox" checked={form.ownerAck} onChange={set("ownerAck")} className="mt-1 w-4 h-4" />
+              <label className="flex items-start gap-3 mb-6 p-4 rounded-md" style={{ backgroundColor: PALEGREY, opacity: ownerFieldsLocked ? 0.7 : 1 }}>
+                <input type="checkbox" checked={form.ownerAck} onChange={set("ownerAck")} disabled={ownerFieldsLocked} className="mt-1 w-4 h-4" />
                 <span className="text-[14px]" style={{ color: INK }}>I am the owner of the item(s) above, and I agree to loan them under the terms of this agreement.</span>
               </label>
 
