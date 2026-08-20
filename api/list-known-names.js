@@ -6,28 +6,7 @@
 
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
-
-const NAME_PREFIXES = [
-  "Rental Application - ",
-  "Agreement to Lease - ",
-  "Residential Lease - ",
-  "Move-In Questionnaire - ",
-  "Item Storage & Donation Consent - ",
-  "Move Support Request - ",
-  "Item Photos - ",
-];
-
-function extractName(fileName) {
-  for (const prefix of NAME_PREFIXES) {
-    if (fileName.startsWith(prefix)) {
-      let rest = fileName.slice(prefix.length);
-      // Legal docs also have " - <date>" on the end — strip that off.
-      rest = rest.replace(/\s*-\s*\d{4}-\d{2}-\d{2}$/, "");
-      return rest.trim();
-    }
-  }
-  return null;
-}
+import { extractName } from "./_documentTypes.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {

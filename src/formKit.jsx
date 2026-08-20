@@ -186,7 +186,7 @@ export function useDraftStorage(storageKey, emptyForm, setForm, queryFieldMap) {
       queryFieldMap.forEach(([queryKey, formKey]) => {
         const v = params.get(queryKey);
         if (v) {
-          seed[formKey] = v;
+          seed[formKey] = typeof emptyForm[formKey] === "boolean" ? v === "true" : v;
           matched = true;
         }
       });

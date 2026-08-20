@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Package, FileSignature, ShieldCheck, PenLine } from "lucide-react";
+import { Package, FileSignature, ShieldCheck, PenLine, Share2, Copy, Check } from "lucide-react";
 import {
   ErrorBoundary, Field, TextInput, TextArea, SectionHeading, Callout,
   AppHeader, NavButtons, SuccessScreen, SignatureField, SubmitErrorBox, SubmitButton,
@@ -26,6 +26,16 @@ const emptyForm = {
 const QUERY_MAP = [
   ["tenant", "ownerName"],
   ["email", "ownerEmail"],
+  ["item", "itemDescription"],
+  ["condition", "itemCondition"],
+  ["value", "estimatedValue"],
+  ["purpose", "loanPurpose"],
+  ["start", "loanStartDate"],
+  ["returnterms", "returnNoticeTerms"],
+  ["transport", "transportResponsibility"],
+  ["care", "specialCareInstructions"],
+  ["osig", "ownerSignature"],
+  ["oack", "ownerAck"],
 ];
 
 const CARE_TERMS = [
@@ -44,6 +54,8 @@ function PropertyLoanForm() {
   const [submitState, setSubmitState] = useState("idle");
   const [resultMessage, setResultMessage] = useState("");
   const [resultLink, setResultLink] = useState(null);
+  const [handoffLink, setHandoffLink] = useState(null);
+  const [handoffCopied, setHandoffCopied] = useState(false);
 
   const draft = useDraftStorage("draft:property-loan-agreement", emptyForm, setForm, QUERY_MAP);
 
@@ -149,6 +161,30 @@ Note: This is a general agreement intended to document a good-faith property loa
     form.ownerName && form.ownerEmail && form.ownerSignature.trim().length > 1 && form.ownerAck &&
     form.borrowerRepName && form.borrowerSignature.trim().length > 1 && form.borrowerAck;
 
+  const ownerSectionComplete =
+    form.ownerName && form.ownerEmail && form.ownerSignature.trim().length > 1 && form.ownerAck;
+  const borrowerStarted = form.borrowerRepName.trim().length > 0 || form.borrowerSignature.trim().length > 0;
+
+  const generateHandoffLink = () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const params = new URLSearchParams();
+    QUERY_MAP.forEach(([queryKey, formKey]) => {
+      const v = form[formKey];
+      if (v === "" || v === undefined || v === null) return;
+      params.set(queryKey, typeof v === "boolean" ? String(v) : v);
+    });
+    setHandoffLink(`${origin}/property-loan-agreement?${params.toString()}`);
+    setHandoffCopied(false);
+  };
+
+  const copyHandoffLink = async () => {
+    try {
+      await navigator.clipboard.writeText(handoffLink);
+      setHandoffCopied(true);
+      setTimeout(() => setHandoffCopied(false), 2000);
+    } catch (e) { /* clipboard unavailable */ }
+  };
+
   if (submitState === "success") {
     return (
       <SuccessScreen
@@ -238,10 +274,43 @@ Note: This is a general agreement intended to document a good-faith property loa
               <div className="mb-4">
                 <SignatureField value={form.ownerSignature} onChange={set("ownerSignature")} />
               </div>
-              <label className="flex items-start gap-3 mb-8 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
+              <label className="flex items-start gap-3 mb-6 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
                 <input type="checkbox" checked={form.ownerAck} onChange={set("ownerAck")} className="mt-1 w-4 h-4" />
                 <span className="text-[14px]" style={{ color: INK }}>I am the owner of the item(s) above, and I agree to loan them under the terms of this agreement.</span>
               </label>
+
+              {ownerSectionComplete && !borrowerStarted && (
+                <div className="mb-8 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
+                  <p className="text-[13px] font-semibold mb-2" style={{ color: SLATE }}>Not finishing this with a staff member right now?</p>
+                  <p className="text-[13px] mb-3" style={{ color: INK }}>
+                    Generate a link with your part already filled in — send it to a staff member to complete their section and submit.
+                  </p>
+                  {!handoffLink ? (
+                    <button
+                      type="button"
+                      onClick={generateHandoffLink}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-md text-[13px] font-semibold text-white"
+                      style={{ backgroundColor: CHARCOAL }}
+                    >
+                      <Share2 size={14} /> Create Link for Staff to Finish
+                    </button>
+                  ) : (
+                    <>
+                      <div className="text-[12px] font-mono p-3 rounded-md mb-2 break-all" style={{ backgroundColor: "#fff", color: CHARCOAL, border: `1px solid ${LIGHTGREY}` }}>
+                        {handoffLink}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={copyHandoffLink}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-md text-[13px] font-semibold text-white"
+                        style={{ backgroundColor: CHARCOAL }}
+                      >
+                        {handoffCopied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy Link</>}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
               <p className="text-[13px] font-bold mb-3" style={{ color: SLATE }}>BORROWER (IJAM Housing Representative)</p>
               <div className="mb-4">

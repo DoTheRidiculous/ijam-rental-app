@@ -13,6 +13,7 @@ import StorageDonationConsentApp from "./StorageDonationConsentApp.jsx";
 import MoveSupportApp from "./MoveSupportApp.jsx";
 import DocumentSearchApp from "./DocumentSearchApp.jsx";
 import PropertyLoanAgreementApp from "./PropertyLoanAgreementApp.jsx";
+import DashboardApp from "./DashboardApp.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/move-support" element={<MoveSupportApp />} />
         <Route path="/find-documents" element={<DocumentSearchApp />} />
         <Route path="/property-loan-agreement" element={<PropertyLoanAgreementApp />} />
+        <Route path="/dashboard" element={<DashboardApp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

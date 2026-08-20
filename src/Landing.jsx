@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch, Package } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch, Package, LayoutDashboard } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const FORM_LINKS = [
@@ -14,6 +14,7 @@ const FORM_LINKS = [
 ];
 
 const STAFF_LINKS = [
+  { href: "/dashboard", title: "Progress Dashboard", desc: "See which forms each applicant has completed, at a glance.", icon: LayoutDashboard },
   { href: "/create-link", title: "Create a Pre-Filled Link", desc: "Build a link with a few fields already filled in for a specific tenant.", icon: Link2 },
   { href: "/find-photos", title: "Find an Applicant's Photos", desc: "Search by name to find and re-share their photo folder link.", icon: Search },
   { href: "/find-documents", title: "Search All Documents", desc: "Find everything on file for one person, and create a link to share it.", icon: FileSearch },

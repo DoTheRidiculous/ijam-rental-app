@@ -1,30 +1,12 @@
 // api/search-all-documents.js
 //
-// Searches across every document/folder type this app creates (Rental
-// Application, Agreement to Lease, Residential Lease, Move-In Questionnaire,
-// Item Storage & Donation Consent, Move Support Request, Item Photos) for a
-// given name, so staff can find everything for one person without opening
-// Drive directly.
+// Searches across every document/folder type this app creates for a given
+// name, so staff can find everything for one person without opening Drive
+// directly.
 
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
-
-const TYPE_PREFIXES = [
-  { type: "Rental Application", prefix: "Rental Application - ", sensitive: true },
-  { type: "Agreement to Lease", prefix: "Agreement to Lease - ", sensitive: false },
-  { type: "Residential Lease", prefix: "Residential Lease - ", sensitive: false },
-  { type: "Move-In Questionnaire", prefix: "Move-In Questionnaire - ", sensitive: false },
-  { type: "Item Storage & Donation Consent", prefix: "Item Storage & Donation Consent - ", sensitive: false },
-  { type: "Move Support Request", prefix: "Move Support Request - ", sensitive: false },
-  { type: "Item Photos", prefix: "Item Photos - ", sensitive: false },
-];
-
-function classify(fileName) {
-  for (const entry of TYPE_PREFIXES) {
-    if (fileName.startsWith(entry.prefix)) return entry;
-  }
-  return { type: "Other", prefix: "", sensitive: false };
-}
+import { classify } from "./_documentTypes.js";
 
 function escapeForDriveQuery(str) {
   return str.replace(/[\\']/g, "\\$&");
