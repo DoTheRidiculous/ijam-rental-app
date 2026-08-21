@@ -10,6 +10,7 @@
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { listAllFilesRecursive } from "./_driveList.js";
+import { getOrCreatePersonFolder } from "./_personFolder.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { docTitle, docText, signerEmail, shareMessage } = req.body || {};
+    const { docTitle, docText, signerEmail, shareMessage, personName } = req.body || {};
     if (!docTitle || !docText) {
       res.status(400).json({ error: "Missing document title or content." });
       return;
@@ -66,8 +67,9 @@ export default async function handler(req, res) {
         requestBody: { requests: [{ insertText: { location: { index: 1 }, text: docText } }] },
       });
     } else {
+      const personFolderId = await getOrCreatePersonFolder(drive, folderId, personName);
       const file = await drive.files.create({
-        requestBody: { name: docTitle, mimeType: "application/vnd.google-apps.document", parents: [folderId] },
+        requestBody: { name: docTitle, mimeType: "application/vnd.google-apps.document", parents: [personFolderId] },
         fields: "id, webViewLink",
       });
       docId = file.data.id;

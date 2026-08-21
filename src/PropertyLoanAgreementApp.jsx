@@ -127,7 +127,7 @@ Note: This is a general agreement intended to document a good-faith property loa
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.ownerEmail,
+        docTitle, docText, signerEmail: form.ownerEmail, personName: form.ownerName,
         shareMessage: "Attached is the completed and signed Property Loan Agreement.",
       });
       draft.clear();

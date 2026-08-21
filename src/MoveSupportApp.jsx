@@ -85,7 +85,7 @@ Acknowledged this is a planning request only: ${f.nonBindingAck ? "Yes" : "No"}
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.respondentEmail,
+        docTitle, docText, signerEmail: form.respondentEmail, personName: form.respondentName,
         shareMessage: "Attached is the Move Support Request form.",
         endpoint: "/api/submit-questionnaire",
       });

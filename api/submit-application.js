@@ -1,8 +1,6 @@
 import { google } from "googleapis";
-
-function isValidEmail(email) {
-  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
+import { getOrCreatePersonFolder } from "./_personFolder.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -11,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { docTitle, docText, signerEmail, shareMessage } = req.body || {};
+    const { docTitle, docText, signerEmail, shareMessage, personName } = req.body || {};
 
     if (!docTitle || !docText) {
       res.status(400).json({ error: "Missing document title or content." });
@@ -26,22 +24,18 @@ export default async function handler(req, res) {
     const folderId = process.env.DRIVE_FOLDER_ID;
     if (!orgEmail) throw new Error("Missing ORG_EMAIL environment variable.");
     if (!folderId) throw new Error("Missing DRIVE_FOLDER_ID environment variable.");
-    if (!process.env.GOOGLE_REFRESH_TOKEN) throw new Error("Missing GOOGLE_REFRESH_TOKEN environment variable.");
 
-    const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET
-    );
-    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+    const auth = getOAuthClient();
+    const drive = google.drive({ version: "v3", auth });
+    const docs = google.docs({ version: "v1", auth });
 
-    const drive = google.drive({ version: "v3", auth: oauth2Client });
-    const docs = google.docs({ version: "v1", auth: oauth2Client });
+    const personFolderId = await getOrCreatePersonFolder(drive, folderId, personName);
 
     const file = await drive.files.create({
       requestBody: {
         name: docTitle,
         mimeType: "application/vnd.google-apps.document",
-        parents: [folderId],
+        parents: [personFolderId],
       },
       fields: "id, webViewLink",
     });

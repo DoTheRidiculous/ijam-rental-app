@@ -150,7 +150,7 @@ By signing, the applicant certified that all information provided is true and co
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.signerEmail,
+        docTitle, docText, signerEmail: form.signerEmail, personName: form.fullName,
         shareMessage: "Attached is the completed and signed Rental Application.",
       });
       draft.clear();

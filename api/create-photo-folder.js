@@ -8,6 +8,7 @@
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { listAllFilesRecursive } from "./_driveList.js";
+import { getOrCreatePersonFolder } from "./_personFolder.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -48,11 +49,12 @@ export default async function handler(req, res) {
       folderId = match.id;
       link = match.webViewLink;
     } else {
+      const personFolderId = await getOrCreatePersonFolder(drive, parentFolderId, name);
       const folder = await drive.files.create({
         requestBody: {
           name: folderTitle,
           mimeType: "application/vnd.google-apps.folder",
-          parents: [parentFolderId],
+          parents: [personFolderId],
         },
         fields: "id, webViewLink",
       });

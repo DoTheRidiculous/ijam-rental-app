@@ -97,7 +97,7 @@ ${DISCLAIMER}
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.respondentEmail,
+        docTitle, docText, signerEmail: form.respondentEmail, personName: form.respondentName,
         shareMessage: "Attached is the Item Storage & Donation Consent form.",
         endpoint: "/api/submit-questionnaire",
       });

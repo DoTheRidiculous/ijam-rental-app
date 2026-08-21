@@ -136,7 +136,7 @@ By signing, the tenant confirmed agreement to the terms above.
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.signerEmail,
+        docTitle, docText, signerEmail: form.signerEmail, personName: form.tenant1Name,
         shareMessage: "Attached is the completed and signed Residential Lease Agreement.",
       });
       draft.clear();

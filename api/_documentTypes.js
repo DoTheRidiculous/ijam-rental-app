@@ -27,10 +27,11 @@ export function extractName(fileName) {
   const entry = classify(fileName);
   if (!entry.prefix) return null;
   let rest = fileName.slice(entry.prefix.length);
-  if (entry.hasDate) {
-    // Legal docs are titled "... - <Name> - <YYYY-MM-DD>" — strip the date.
-    rest = rest.replace(/\s*-\s*\d{4}-\d{2}-\d{2}$/, "");
-  }
+  // Strip a trailing " - YYYY-MM-DD" if present, regardless of type. Some
+  // types don't normally include a date, but older/legacy submissions
+  // might — stripping it is harmless when there's nothing to strip, and
+  // prevents one person from fragmenting into multiple dashboard rows.
+  rest = rest.replace(/\s*-\s*\d{4}-\d{2}-\d{2}$/, "");
   rest = rest.trim();
   return rest || null;
 }

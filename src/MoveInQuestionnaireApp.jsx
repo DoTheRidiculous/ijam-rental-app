@@ -166,7 +166,7 @@ This questionnaire is a planning tool, not a legal document. Once reviewed, we'l
 
     try {
       const data = await submitToDrive({
-        docTitle, docText, signerEmail: form.respondentEmail,
+        docTitle, docText, signerEmail: form.respondentEmail, personName: form.respondentName,
         shareMessage: "Attached is the completed Move-In, Furniture & Storage Questionnaire.",
         endpoint: "/api/submit-questionnaire",
       });
