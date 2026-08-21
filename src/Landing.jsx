@@ -27,12 +27,12 @@ function LinkCard({ href, title, desc, icon: Icon }) {
       className="flex items-center gap-4 bg-white border rounded-xl p-5 transition-shadow hover:shadow-sm"
       style={{ borderColor: LIGHTGREY }}
     >
-      <div className="w-11 h-11 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: PALEGREY, border: `0.5px solid ${LIGHTGREY}` }}>
-        <Icon size={19} color={CHARCOAL} />
+      <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: PALEGREY }}>
+        <Icon size={20} color={CHARCOAL} />
       </div>
       <div className="flex-1">
         <p className="text-[16px] font-bold" style={{ color: CHARCOAL }}>{title}</p>
-        <p className="text-[13px] mt-0.5" style={{ color: SLATE }}>{desc}</p>
+        <p className="text-[13px]" style={{ color: SLATE }}>{desc}</p>
       </div>
       <ArrowRight size={18} color={MIDGREY} />
     </a>
@@ -43,22 +43,15 @@ export default function Landing() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALEGREY }}>
       <div className="max-w-2xl mx-auto px-5 py-14">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#fff", border: `0.5px solid ${LIGHTGREY}` }}>
-            <HomeIcon size={17} color={CHARCOAL} />
-          </div>
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.12em] mb-0" style={{ color: MIDGREY }}>IJAM HOUSING</p>
-            <h1 className="text-[26px] font-bold" style={{ color: CHARCOAL }}>Housing Documents</h1>
-          </div>
-        </div>
-        <p className="text-[15px] mb-8 mt-2.5" style={{ color: SLATE }}>Choose the document you need to fill out and sign.</p>
+        <p className="text-[12px] font-bold tracking-[0.15em] mb-2" style={{ color: MIDGREY }}>IJAM HOUSING</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: CHARCOAL }}>Housing Documents</h1>
+        <p className="text-[15px] mb-8" style={{ color: SLATE }}>Choose the document you need to fill out and sign.</p>
 
         <div className="flex flex-col gap-3 mb-10">
           {FORM_LINKS.map((link) => <LinkCard key={link.href} {...link} />)}
         </div>
 
-        <p className="text-[11px] font-semibold tracking-[0.12em] mb-3" style={{ color: MIDGREY }}>STAFF TOOLS</p>
+        <p className="text-[12px] font-bold tracking-[0.15em] mb-3" style={{ color: MIDGREY }}>STAFF TOOLS</p>
         <div className="flex flex-col gap-3">
           {STAFF_LINKS.map((link) => <LinkCard key={link.href} {...link} />)}
         </div>
