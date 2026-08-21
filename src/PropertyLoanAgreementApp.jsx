@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Package, FileSignature, ShieldCheck, PenLine, Share2, Copy, Check, Lock } from "lucide-react";
+import { Package, FileSignature, ShieldCheck, PenLine, Share2, Check, Lock } from "lucide-react";
 import {
   ErrorBoundary, Field, TextInput, TextArea, SectionHeading, Callout,
   AppHeader, NavButtons, SuccessScreen, SignatureField, SubmitErrorBox, SubmitButton,
@@ -55,7 +55,8 @@ function PropertyLoanForm() {
   const [resultMessage, setResultMessage] = useState("");
   const [resultLink, setResultLink] = useState(null);
   const [handoffLink, setHandoffLink] = useState(null);
-  const [handoffCopied, setHandoffCopied] = useState(false);
+  const [handoffState, setHandoffState] = useState("idle"); // idle | sending | sent | error
+  const [handoffError, setHandoffError] = useState("");
 
   const draft = useDraftStorage("draft:property-loan-agreement", emptyForm, setForm, QUERY_MAP);
 
@@ -166,7 +167,7 @@ Note: This is a general agreement intended to document a good-faith property loa
   const borrowerStarted = form.borrowerRepName.trim().length > 0 || form.borrowerSignature.trim().length > 0;
   const ownerFieldsLocked = draft.prefilledNotice && ownerSectionComplete;
 
-  const generateHandoffLink = () => {
+  const sendHandoffLink = async () => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const params = new URLSearchParams();
     QUERY_MAP.forEach(([queryKey, formKey]) => {
@@ -174,16 +175,24 @@ Note: This is a general agreement intended to document a good-faith property loa
       if (v === "" || v === undefined || v === null) return;
       params.set(queryKey, typeof v === "boolean" ? String(v) : v);
     });
-    setHandoffLink(`${origin}/property-loan-agreement?${params.toString()}`);
-    setHandoffCopied(false);
-  };
+    const link = `${origin}/property-loan-agreement?${params.toString()}`;
+    setHandoffLink(link);
+    setHandoffState("sending");
+    setHandoffError("");
 
-  const copyHandoffLink = async () => {
     try {
-      await navigator.clipboard.writeText(handoffLink);
-      setHandoffCopied(true);
-      setTimeout(() => setHandoffCopied(false), 2000);
-    } catch (e) { /* clipboard unavailable */ }
+      const res = await fetch("/api/send-handoff-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ link, ownerName: form.ownerName }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not send this to staff.");
+      setHandoffState("sent");
+    } catch (err) {
+      setHandoffError(err.message || "Something went wrong sending this to staff.");
+      setHandoffState("error");
+    }
   };
 
   if (submitState === "success") {
@@ -292,31 +301,33 @@ Note: This is a general agreement intended to document a good-faith property loa
                 <div className="mb-8 p-4 rounded-md" style={{ backgroundColor: PALEGREY }}>
                   <p className="text-[13px] font-semibold mb-2" style={{ color: SLATE }}>Not finishing this with a staff member right now?</p>
                   <p className="text-[13px] mb-3" style={{ color: INK }}>
-                    Generate a link with your part already filled in — send it to a staff member to complete their section and submit.
+                    We'll email {ORG_EMAIL} a link with your part already filled in, so a staff member can complete their section and finalize this agreement.
                   </p>
-                  {!handoffLink ? (
+                  {handoffState === "sent" ? (
+                    <div className="flex items-center gap-2 text-[13px] font-semibold" style={{ color: CHARCOAL }}>
+                      <Check size={16} /> Sent to {ORG_EMAIL}
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      onClick={generateHandoffLink}
+                      onClick={sendHandoffLink}
+                      disabled={handoffState === "sending"}
                       className="flex items-center gap-2 px-4 py-2.5 rounded-md text-[13px] font-semibold text-white"
-                      style={{ backgroundColor: CHARCOAL }}
+                      style={{ backgroundColor: CHARCOAL, opacity: handoffState === "sending" ? 0.6 : 1 }}
                     >
-                      <Share2 size={14} /> Create Link for Staff to Finish
+                      <Share2 size={14} /> {handoffState === "sending" ? "Sending…" : handoffState === "error" ? "Try Again" : "Send to Staff to Finish"}
                     </button>
-                  ) : (
-                    <>
-                      <div className="text-[12px] font-mono p-3 rounded-md mb-2 break-all" style={{ backgroundColor: "#fff", color: CHARCOAL, border: `1px solid ${LIGHTGREY}` }}>
+                  )}
+                  {handoffState === "error" && (
+                    <p className="text-[12px] mt-2" style={{ color: SLATE }}>{handoffError}</p>
+                  )}
+                  {handoffLink && (
+                    <details className="mt-3">
+                      <summary className="text-[12px] cursor-pointer" style={{ color: MIDGREY }}>Show link (for your records, or to copy manually)</summary>
+                      <div className="text-[12px] font-mono p-3 rounded-md mt-2 break-all" style={{ backgroundColor: "#fff", color: CHARCOAL, border: `1px solid ${LIGHTGREY}` }}>
                         {handoffLink}
                       </div>
-                      <button
-                        type="button"
-                        onClick={copyHandoffLink}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-md text-[13px] font-semibold text-white"
-                        style={{ backgroundColor: CHARCOAL }}
-                      >
-                        {handoffCopied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy Link</>}
-                      </button>
-                    </>
+                    </details>
                   )}
                 </div>
               )}

@@ -7,10 +7,7 @@
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
 import { classify } from "./_documentTypes.js";
-
-function escapeForDriveQuery(str) {
-  return str.replace(/[\\']/g, "\\$&");
-}
+import { listAllFilesRecursive } from "./_driveList.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -19,12 +16,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const rawQuery = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    const rawQuery = typeof req.query.q === "string" ? req.query.q.trim().toLowerCase() : "";
     if (!rawQuery) {
       res.status(400).json({ error: "Missing search query." });
       return;
     }
-    const safeQuery = escapeForDriveQuery(rawQuery);
 
     const folderIds = [
       ...new Set([process.env.DRIVE_FOLDER_ID, process.env.PHOTOS_FOLDER_ID].filter(Boolean)),
@@ -34,18 +30,13 @@ export default async function handler(req, res) {
     const auth = getOAuthClient();
     const drive = google.drive({ version: "v3", auth });
 
-    const allFiles = [];
-    for (const folderId of folderIds) {
-      const result = await drive.files.list({
-        q: `'${folderId}' in parents and trashed=false and name contains '${safeQuery}'`,
-        fields: "files(id, name, mimeType, webViewLink, createdTime)",
-        orderBy: "createdTime desc",
-        pageSize: 50,
-      });
-      allFiles.push(...(result.data.files || []));
-    }
+    const allFiles = await listAllFilesRecursive(drive, folderIds);
+    const matched = allFiles
+      .filter((f) => f.name.toLowerCase().includes(rawQuery))
+      .sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
+      .slice(0, 50);
 
-    const results = allFiles.map((f) => {
+    const results = matched.map((f) => {
       const { type, sensitive } = classify(f.name);
       return {
         id: f.id,

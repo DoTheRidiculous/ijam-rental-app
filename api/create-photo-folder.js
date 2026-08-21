@@ -7,10 +7,7 @@
 
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
-
-function escapeForDriveQuery(str) {
-  return str.replace(/[\\']/g, "\\$&");
-}
+import { listAllFilesRecursive } from "./_driveList.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -35,18 +32,14 @@ export default async function handler(req, res) {
     const drive = google.drive({ version: "v3", auth });
 
     const folderTitle = `Item Photos - ${name}`;
-    const safeTitle = escapeForDriveQuery(folderTitle);
 
-    // Reuse an existing folder for this person if one already exists.
-    // Matching is case-insensitive since "contains" is used, then verified.
-    const existing = await drive.files.list({
-      q: `'${parentFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false and name contains '${safeTitle}'`,
-      fields: "files(id, name, webViewLink)",
-      pageSize: 10,
-    });
-
-    const match = (existing.data.files || []).find(
-      (f) => f.name.trim().toLowerCase() === folderTitle.trim().toLowerCase()
+    // Reuse an existing folder for this person if one already exists,
+    // even if it's been moved into a subfolder for organization.
+    const allFiles = await listAllFilesRecursive(drive, [parentFolderId]);
+    const match = allFiles.find(
+      (f) =>
+        f.mimeType === "application/vnd.google-apps.folder" &&
+        f.name.trim().toLowerCase() === folderTitle.trim().toLowerCase()
     );
 
     let folderId, link;

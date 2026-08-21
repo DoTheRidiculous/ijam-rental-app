@@ -8,6 +8,7 @@
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
 import { TYPE_PREFIXES, classify, extractName } from "./_documentTypes.js";
+import { listAllFilesRecursive } from "./_driveList.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -24,20 +25,7 @@ export default async function handler(req, res) {
     const auth = getOAuthClient();
     const drive = google.drive({ version: "v3", auth });
 
-    const allFiles = [];
-    for (const folderId of folderIds) {
-      let pageToken;
-      do {
-        const result = await drive.files.list({
-          q: `'${folderId}' in parents and trashed=false`,
-          fields: "nextPageToken, files(id, name, webViewLink, createdTime)",
-          pageSize: 1000,
-          pageToken,
-        });
-        allFiles.push(...(result.data.files || []));
-        pageToken = result.data.nextPageToken || undefined;
-      } while (pageToken);
-    }
+    const allFiles = await listAllFilesRecursive(drive, folderIds);
 
     const applicants = {}; // name -> { [type]: { completed, date, link, count } }
 

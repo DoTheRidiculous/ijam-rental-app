@@ -9,10 +9,7 @@
 
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
-
-function escapeForDriveQuery(str) {
-  return str.replace(/[\\']/g, "\\$&");
-}
+import { listAllFilesRecursive } from "./_driveList.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -36,14 +33,11 @@ export default async function handler(req, res) {
     const drive = google.drive({ version: "v3", auth });
     const docs = google.docs({ version: "v1", auth });
 
-    const safeTitle = escapeForDriveQuery(docTitle);
-    const existing = await drive.files.list({
-      q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.document' and trashed=false and name contains '${safeTitle}'`,
-      fields: "files(id, name, webViewLink)",
-      pageSize: 10,
-    });
-    const match = (existing.data.files || []).find(
-      (f) => f.name.trim().toLowerCase() === docTitle.trim().toLowerCase()
+    const allFiles = await listAllFilesRecursive(drive, [folderId]);
+    const match = allFiles.find(
+      (f) =>
+        f.mimeType === "application/vnd.google-apps.document" &&
+        f.name.trim().toLowerCase() === docTitle.trim().toLowerCase()
     );
 
     let docId, link;
