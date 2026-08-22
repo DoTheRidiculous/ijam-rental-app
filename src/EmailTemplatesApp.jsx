@@ -12,12 +12,13 @@ const TEMPLATES = [
     key: "rental-application",
     label: "Rental Application",
     icon: FileText,
+    path: "/rental-application",
     subject: "Next step: Rental Application",
     body: `Hi {{name}},
 
 The next step is completing a rental application. I've put together a short online form that walks you through it step by step — property details, your info, current and past residences, employment, references, and a couple of background questions:
 
-{{link}}/rental-application
+{{link}}
 
 It takes about 10-15 minutes. Your progress saves automatically, so if you need to step away and finish later, you can pick up right where you left off on the same device.
 
@@ -33,6 +34,7 @@ IJAM Housing`,
     key: "proof-of-income",
     label: "Proof of Income",
     icon: FileUp,
+    path: "/proof-of-income",
     subject: "Please upload proof of income",
     body: `Hi {{name}},
 
@@ -40,7 +42,7 @@ To finish processing your application, we need to see proof of income — this c
 
 You can upload it here, PDFs or photos both work:
 
-{{link}}/proof-of-income
+{{link}}
 
 This goes to a private folder that only our staff can see — it isn't a public link.
 
@@ -54,12 +56,13 @@ IJAM Housing`,
     key: "storage-donation",
     label: "Storage & Donation Consent",
     icon: Gift,
+    path: "/storage-donation-consent",
     subject: "A form for planning storage & donations — no rush",
     body: `Hi {{name}},
 
 As we plan out your move, we know there may be some things you can't bring with you — whether that's because of space, or just things you're ready to let go of. We put together a short form so you can let us know what you'd like help storing, and what you're comfortable donating or giving away, entirely at your own pace and on your own terms:
 
-{{link}}/storage-donation-consent
+{{link}}
 
 A few things worth knowing:
 - Nothing gets given away without you specifically checking a box saying it's okay
@@ -76,12 +79,13 @@ IJAM Housing`,
     key: "move-support",
     label: "Move Support Request",
     icon: Truck,
+    path: "/move-support",
     subject: "Quick form: Move support & timing",
     body: `Hi {{name}},
 
 As your move gets closer, we'd like to know what kind of support might be helpful — whether that's a hand moving things, or boxes to pack with. Could you fill out this quick form when you get a chance?
 
-{{link}}/move-support
+{{link}}
 
 It just asks:
 - Whether you could use help moving your things
@@ -99,12 +103,13 @@ IJAM Housing`,
     key: "property-loan",
     label: "Property Loan Agreement",
     icon: Package,
+    path: "/property-loan-agreement",
     subject: "Let's put your item loan in writing",
     body: `Hi {{name}},
 
 Thank you so much for offering to loan an item for our use — that's a huge help. Since it's still your property and you'll want it back eventually, we want to put together a quick written agreement so everything is clear for both of us.
 
-{{link}}/property-loan-agreement
+{{link}}
 
 It covers a description of the item and its condition, the terms of the loan, and how we'll take care of it and return it — normal wear and tear is on us, and you keep ownership the whole time.
 
@@ -159,12 +164,13 @@ IJAM Housing`,
     key: "move-in-questionnaire",
     label: "Move-In & Storage Questionnaire",
     icon: Boxes,
+    path: "/move-in-questionnaire",
     subject: "Quick form: Move-in planning",
     body: `Hi {{name}},
 
 To help plan your move-in, could you fill out this short questionnaire? It covers timing, furniture, and any storage needs:
 
-{{link}}/move-in-questionnaire
+{{link}}
 
 It only takes a few minutes, and you're welcome to come back and update your answers anytime if plans change.
 
@@ -176,12 +182,13 @@ IJAM Housing`,
     key: "item-photos",
     label: "Item Photos",
     icon: Camera,
+    path: "/item-photos",
     subject: "Please upload photos of your items",
     body: `Hi {{name}},
 
 Could you take or upload a few photos of your larger furniture and belongings? This helps us know what to expect ahead of your move:
 
-{{link}}/item-photos
+{{link}}
 
 You can label each photo as you go — no rush, and you can add more anytime using the same link.
 
@@ -193,12 +200,13 @@ IJAM Housing`,
     key: "agreement-to-lease-only",
     label: "Agreement to Lease",
     icon: FileSignature,
+    path: "/agreement-to-lease",
     subject: "Please complete: Agreement to Lease",
     body: `Hi {{name}},
 
 Here's the link to complete your Agreement to Lease:
 
-{{link}}/agreement-to-lease
+{{link}}
 
 Let me know if anything comes up while you're filling it out.
 
@@ -210,12 +218,13 @@ IJAM Housing`,
     key: "residential-lease-only",
     label: "Residential Lease",
     icon: FileSignature,
+    path: "/residential-lease",
     subject: "Please complete: Residential Lease",
     body: `Hi {{name}},
 
 Here's the link to complete your Residential Lease:
 
-{{link}}/residential-lease
+{{link}}
 
 Let me know if anything comes up while you're filling it out.
 
@@ -227,16 +236,17 @@ IJAM Housing`,
     key: "lease-documents",
     label: "Agreement to Lease + Residential Lease",
     icon: FileSignature,
+    paths: ["/agreement-to-lease", "/residential-lease"],
     subject: "Two quick things to finish up your lease",
     body: `Hi {{name}},
 
 A couple of things to finish up now that your terms are confirmed:
 
 1) The Agreement to Lease:
-{{link}}/agreement-to-lease
+{{link1}}
 
 2) The full Residential Lease, which has all the details of your tenancy:
-{{link}}/residential-lease
+{{link2}}
 
 Both only take a few minutes. Let me know if anything comes up while you're filling them out!
 
@@ -263,11 +273,32 @@ IJAM Housing`,
   },
 ];
 
-function fillTemplate(text, { name, staff }) {
-  return text
+function buildPrefilledLink(path, { name, email }) {
+  if (!path) return "";
+  const params = new URLSearchParams();
+  if (name) params.set("tenant", name);
+  if (email) params.set("email", email);
+  const qs = params.toString();
+  return `${ORIGIN_PLACEHOLDER}${path}${qs ? `?${qs}` : ""}`;
+}
+
+function fillTemplate(template, { name, email, staff }) {
+  let subject = template.subject
     .replaceAll("{{name}}", name || "[Name]")
-    .replaceAll("{{staff}}", staff || "[Your Name]")
-    .replaceAll("{{link}}", ORIGIN_PLACEHOLDER);
+    .replaceAll("{{staff}}", staff || "[Your Name]");
+  let body = template.body
+    .replaceAll("{{name}}", name || "[Name]")
+    .replaceAll("{{staff}}", staff || "[Your Name]");
+
+  if (template.path) {
+    body = body.replaceAll("{{link}}", buildPrefilledLink(template.path, { name, email }));
+  }
+  if (template.paths) {
+    template.paths.forEach((p, i) => {
+      body = body.replaceAll(`{{link${i + 1}}}`, buildPrefilledLink(p, { name, email }));
+    });
+  }
+  return { subject, body };
 }
 
 export default function EmailTemplatesApp() {
@@ -284,18 +315,18 @@ export default function EmailTemplatesApp() {
 
   const template = TEMPLATES.find((t) => t.key === selectedKey);
 
+  const refill = (tmpl = template) => {
+    const filled = fillTemplate(tmpl, { name: recipientName, email: recipientEmail, staff: staffName });
+    setSubject(filled.subject);
+    setBody(filled.body);
+  };
+
   useEffect(() => {
-    setSubject(fillTemplate(template.subject, { name: recipientName, staff: staffName }));
-    setBody(fillTemplate(template.body, { name: recipientName, staff: staffName }));
+    refill(template);
     setSendState("idle");
     setSendError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey]);
-
-  const refillFromNames = () => {
-    setSubject(fillTemplate(template.subject, { name: recipientName, staff: staffName }));
-    setBody(fillTemplate(template.body, { name: recipientName, staff: staffName }));
-  };
 
   const copyBody = async () => {
     try {
@@ -324,6 +355,7 @@ export default function EmailTemplatesApp() {
   };
 
   const canSend = recipientEmail.trim().length > 3 && subject.trim() && body.trim();
+  const hasLink = Boolean(template.path || template.paths);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALEGREY }}>
@@ -384,7 +416,7 @@ export default function EmailTemplatesApp() {
                   <input
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
-                    onBlur={refillFromNames}
+                    onBlur={() => refill()}
                     list="known-names-email"
                     className="w-full rounded-md border px-3 py-2 text-[14px] outline-none"
                     style={{ borderColor: LIGHTGREY, color: INK }}
@@ -399,6 +431,7 @@ export default function EmailTemplatesApp() {
                     type="email"
                     value={recipientEmail}
                     onChange={(e) => setRecipientEmail(e.target.value)}
+                    onBlur={() => refill()}
                     className="w-full rounded-md border px-3 py-2 text-[14px] outline-none"
                     style={{ borderColor: LIGHTGREY, color: INK }}
                   />
@@ -408,12 +441,17 @@ export default function EmailTemplatesApp() {
                   <input
                     value={staffName}
                     onChange={(e) => setStaffName(e.target.value)}
-                    onBlur={refillFromNames}
+                    onBlur={() => refill()}
                     className="w-full rounded-md border px-3 py-2 text-[14px] outline-none"
                     style={{ borderColor: LIGHTGREY, color: INK }}
                   />
                 </div>
               </div>
+              {hasLink && (
+                <p className="text-[12px] mt-3" style={{ color: MIDGREY }}>
+                  The link in this template will be pre-filled with the name and email above — same as Create a Pre-Filled Link.
+                </p>
+              )}
             </div>
 
             <div className="bg-white rounded-xl border p-4 sm:p-5" style={{ borderColor: LIGHTGREY }}>
