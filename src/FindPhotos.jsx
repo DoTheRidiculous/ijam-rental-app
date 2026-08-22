@@ -11,14 +11,20 @@ export default function FindPhotos() {
   const knownNames = useKnownNames();
 
   const search = async () => {
+    if (!query.trim()) {
+      setError("Type a name to search for.");
+      setResults(null);
+      return;
+    }
     setLoading(true);
     setError("");
     setResults(null);
     try {
-      const res = await fetch(`/api/list-photo-folders?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search-all-documents?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Search failed.");
-      setResults(data.folders);
+      const folders = (data.results || []).filter((r) => r.type === "Item Photos" && r.isFolder);
+      setResults(folders);
     } catch (e) {
       setError(e.message || "Something went wrong searching.");
     } finally {

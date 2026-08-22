@@ -181,10 +181,16 @@ Note: This is a general agreement intended to document a good-faith property loa
     setHandoffError("");
 
     try {
-      const res = await fetch("/api/send-handoff-link", {
+      const res = await fetch("/api/send-template-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ link, ownerName: form.ownerName }),
+        body: JSON.stringify({
+          to: ORG_EMAIL,
+          subject: `Property Loan Agreement — ready for staff signature (${form.ownerName || "Owner"})`,
+          body:
+            `${form.ownerName || "The owner"} has completed and signed their part of the Property Loan Agreement.\n\n` +
+            `Open this link to review their section and complete the Borrower (staff) signature:\n${link}\n`,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not send this to staff.");
