@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { jsPDF } from "jspdf";
-import { Loader2, AlertTriangle, CheckCircle2, Download, RotateCcw, ChevronLeft, ChevronRight, Type, PenLine } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle2, Download, RotateCcw, ChevronLeft, ChevronRight, Type, PenLine, Lock } from "lucide-react";
 
 // ---------- Design tokens (matches the IJAM Housing document series) ----------
 export const INK = "#1A1A1A";
@@ -453,5 +453,71 @@ export function SubmitButton({ canSubmit, submitState, onClick, label = "Sign & 
         </>
       )}
     </button>
+  );
+}
+
+// StaffGate — a lightweight PIN prompt in front of internal-only tool pages.
+// This is NOT real security: the PIN lives in the browser bundle and is
+// visible to anyone who inspects the page source or network requests. It
+// exists purely to signal "this isn't for you" to a tenant who wanders onto
+// a staff URL, and to save staff from an accidental stumble-in. Nothing
+// sensitive (like Rental Application data) is ever gated only by this —
+// that data lives in Drive with its own real permissions.
+const STAFF_UNLOCK_KEY = "ijam-staff-unlocked";
+
+export function StaffGate({ children }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setUnlocked(localStorage.getItem(STAFF_UNLOCK_KEY) === "true");
+    setChecked(true);
+  }, []);
+
+  const submit = (e) => {
+    e.preventDefault();
+    const expected = import.meta.env.VITE_STAFF_PIN;
+    if (!expected) {
+      // No PIN configured — don't lock staff out of their own tools.
+      setUnlocked(true);
+      return;
+    }
+    if (pin === expected) {
+      localStorage.setItem(STAFF_UNLOCK_KEY, "true");
+      setUnlocked(true);
+      setError("");
+    } else {
+      setError("That's not the right PIN.");
+    }
+  };
+
+  if (!checked) return null;
+  if (unlocked) return children;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: PALEGREY }}>
+      <form onSubmit={submit} className="max-w-xs w-full bg-white rounded-xl border p-7 text-center" style={{ borderColor: LIGHTGREY }}>
+        <div className="w-10 h-10 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: PALEGREY }}>
+          <Lock size={18} color={CHARCOAL} />
+        </div>
+        <p className="text-[15px] font-bold mb-1" style={{ color: CHARCOAL }}>Staff access</p>
+        <p className="text-[13px] mb-5" style={{ color: SLATE }}>This page is for IJAM Housing staff.</p>
+        <input
+          type="password"
+          value={pin}
+          onChange={(e) => { setPin(e.target.value); setError(""); }}
+          placeholder="Staff PIN"
+          autoFocus
+          className="w-full rounded-md border px-3 py-2.5 text-[14px] outline-none text-center mb-3"
+          style={{ borderColor: LIGHTGREY, color: INK }}
+        />
+        {error && <p className="text-[12px] mb-3" style={{ color: SLATE }}>{error}</p>}
+        <button type="submit" className="w-full py-2.5 rounded-md text-[14px] font-semibold text-white" style={{ backgroundColor: CHARCOAL }}>
+          Unlock
+        </button>
+      </form>
+    </div>
   );
 }

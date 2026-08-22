@@ -16,26 +16,27 @@ import PropertyLoanAgreementApp from "./PropertyLoanAgreementApp.jsx";
 import DashboardApp from "./DashboardApp.jsx";
 import EmailTemplatesApp from "./EmailTemplatesApp.jsx";
 import ProofOfIncomeApp from "./ProofOfIncomeApp.jsx";
+import { StaffGate } from "./formKit.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/create-link" element={<LinkBuilder />} />
+        <Route path="/" element={<StaffGate><Landing /></StaffGate>} />
+        <Route path="/create-link" element={<StaffGate><LinkBuilder /></StaffGate>} />
         <Route path="/rental-application" element={<RentalApplicationApp />} />
         <Route path="/agreement-to-lease" element={<AgreementToLeaseApp />} />
         <Route path="/residential-lease" element={<ResidentialLeaseApp />} />
         <Route path="/move-in-questionnaire" element={<MoveInQuestionnaireApp />} />
         <Route path="/item-photos" element={<PhotoUploadApp />} />
-        <Route path="/find-photos" element={<FindPhotos />} />
+        <Route path="/find-photos" element={<StaffGate><FindPhotos /></StaffGate>} />
         <Route path="/storage-donation-consent" element={<StorageDonationConsentApp />} />
         <Route path="/move-support" element={<MoveSupportApp />} />
-        <Route path="/find-documents" element={<DocumentSearchApp />} />
+        <Route path="/find-documents" element={<StaffGate><DocumentSearchApp /></StaffGate>} />
         <Route path="/property-loan-agreement" element={<PropertyLoanAgreementApp />} />
-        <Route path="/dashboard" element={<DashboardApp />} />
-        <Route path="/email-templates" element={<EmailTemplatesApp />} />
+        <Route path="/dashboard" element={<StaffGate><DashboardApp /></StaffGate>} />
+        <Route path="/email-templates" element={<StaffGate><EmailTemplatesApp /></StaffGate>} />
         <Route path="/proof-of-income" element={<ProofOfIncomeApp />} />
       </Routes>
     </BrowserRouter>
