@@ -14,6 +14,7 @@ export const TYPE_PREFIXES = [
   { type: "Move Support Request", prefix: "Move Support Request - ", sensitive: false, hasDate: false },
   { type: "Item Photos", prefix: "Item Photos - ", sensitive: false, hasDate: false },
   { type: "Property Loan Agreement", prefix: "Property Loan Agreement - ", sensitive: false, hasDate: true },
+  { type: "Proof of Income", prefix: "Proof of Income - ", sensitive: true, hasDate: false },
 ];
 
 export function classify(fileName) {

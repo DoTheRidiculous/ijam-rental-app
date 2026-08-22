@@ -10,7 +10,10 @@ export default function handler(req, res) {
   const url = oauth2Client.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
-    scope: ["https://www.googleapis.com/auth/drive"],
+    scope: [
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/gmail.send",
+    ],
   });
 
   res.writeHead(302, { Location: url });

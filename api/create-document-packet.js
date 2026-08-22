@@ -6,13 +6,15 @@
 //   3. Sets that packet doc to "anyone with the link can view" too
 // Returns the packet doc's link — the one link to forward to someone else.
 //
-// The Rental Application is intentionally excluded from ever being widened
-// or listed here, since it contains a Social Security number. The frontend
-// already filters it out before calling this, and this endpoint re-checks
-// server-side too, so it can't be included even by a bad request.
+// Anything the shared classify() function marks as sensitive (currently:
+// Rental Application, Proof of Income) is intentionally excluded from ever
+// being widened or listed here. The frontend already filters these out
+// before calling this, and this endpoint re-checks server-side too, so
+// they can't be included even by a bad request.
 
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
+import { classify } from "./_documentTypes.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -30,10 +32,11 @@ export default async function handler(req, res) {
     const folderId = process.env.DRIVE_FOLDER_ID;
     if (!folderId) throw new Error("Missing DRIVE_FOLDER_ID environment variable.");
 
-    // Server-side safety net — never include anything named like a Rental Application.
-    const safeItems = items.filter((it) => it && it.id && it.title && !/^Rental Application\b/.test(it.title));
+    // Server-side safety net — never include anything the shared classifier
+    // considers sensitive, regardless of what the frontend already filtered.
+    const safeItems = items.filter((it) => it && it.id && it.title && !classify(it.title).sensitive);
     if (safeItems.length === 0) {
-      res.status(400).json({ error: "Nothing eligible to include (Rental Applications are excluded for privacy)." });
+      res.status(400).json({ error: "Nothing eligible to include (sensitive documents are excluded for privacy)." });
       return;
     }
 

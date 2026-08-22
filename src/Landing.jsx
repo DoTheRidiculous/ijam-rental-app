@@ -1,9 +1,10 @@
 import React from "react";
-import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch, Package, LayoutDashboard } from "lucide-react";
+import { FileText, FileSignature, Home as HomeIcon, ArrowRight, Link2, Boxes, Camera, Search, Gift, Truck, FileSearch, Package, LayoutDashboard, Mail, FileUp } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const FORM_LINKS = [
   { href: "/rental-application", title: "Rental Application", desc: "For prospective applicants to apply for a unit.", icon: FileText },
+  { href: "/proof-of-income", title: "Proof of Income", desc: "Upload pay stubs or other documents showing income.", icon: FileUp },
   { href: "/agreement-to-lease", title: "Agreement to Lease", desc: "Reserve a unit ahead of the full lease signing.", icon: FileSignature },
   { href: "/residential-lease", title: "Residential Lease", desc: "The full lease agreement for move-in.", icon: HomeIcon },
   { href: "/move-in-questionnaire", title: "Move-In & Storage Questionnaire", desc: "Plan move-in timing, furniture, and storage needs.", icon: Boxes },
@@ -15,6 +16,7 @@ const FORM_LINKS = [
 
 const STAFF_LINKS = [
   { href: "/dashboard", title: "Progress Dashboard", desc: "See which forms each applicant has completed, at a glance.", icon: LayoutDashboard },
+  { href: "/email-templates", title: "Email Templates", desc: "Pick a saved template, fill it in, and send it right from here.", icon: Mail },
   { href: "/create-link", title: "Create a Pre-Filled Link", desc: "Build a link with a few fields already filled in for a specific tenant.", icon: Link2 },
   { href: "/find-photos", title: "Find an Applicant's Photos", desc: "Search by name to find and re-share their photo folder link.", icon: Search },
   { href: "/find-documents", title: "Search All Documents", desc: "Find everything on file for one person, and create a link to share it.", icon: FileSearch },

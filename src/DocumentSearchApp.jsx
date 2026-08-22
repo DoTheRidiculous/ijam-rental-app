@@ -142,7 +142,7 @@ export default function DocumentSearchApp() {
                           <p className="text-[15px] font-bold" style={{ color: CHARCOAL }}>{r.type}</p>
                           {r.sensitive && (
                             <span className="flex items-center gap-1 text-[11px] font-semibold px-1.5 py-0.5 rounded" style={{ backgroundColor: "#F5F0EE", color: SLATE }}>
-                              <ShieldAlert size={11} /> Contains SSN
+                              <ShieldAlert size={11} /> Sensitive
                             </span>
                           )}
                         </div>
@@ -179,7 +179,7 @@ export default function DocumentSearchApp() {
                   <span className="text-[13px] font-bold tracking-wide" style={{ color: SLATE }}>SEND TO SOMEONE ELSE</span>
                 </div>
                 <p className="text-[13px] mb-4" style={{ color: SLATE }}>
-                  Creates one link with everything above{sensitiveResults.length > 0 ? " except the Rental Application, which is left out for privacy" : ""}.
+                  Creates one link with everything above{sensitiveResults.length > 0 ? ` except ${[...new Set(sensitiveResults.map((r) => r.type))].join(" and ")}, which ${sensitiveResults.length > 1 ? "are" : "is"} left out for privacy` : ""}.
                   Whoever opens it can view it without needing Drive access.
                 </p>
 

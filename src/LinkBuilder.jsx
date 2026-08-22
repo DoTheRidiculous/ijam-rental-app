@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Link2, Copy, Check, ArrowLeft, FileText, FileSignature, Home as HomeIcon,
-  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock,
+  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock, FileUp,
 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, INK } from "./formKit.jsx";
 
@@ -19,6 +19,17 @@ const DOC_TYPES = [
       { key: "tenant", label: "Applicant Name" },
       { key: "email", label: "Applicant Email" },
       { key: "phone", label: "Applicant Phone" },
+    ],
+  },
+  {
+    key: "proof-of-income",
+    label: "Proof of Income",
+    shortLabel: "Proof of income",
+    icon: FileUp,
+    path: "/proof-of-income",
+    fields: [
+      { key: "tenant", label: "Applicant Name" },
+      { key: "email", label: "Applicant Email" },
     ],
   },
   {

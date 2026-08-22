@@ -14,6 +14,8 @@ import MoveSupportApp from "./MoveSupportApp.jsx";
 import DocumentSearchApp from "./DocumentSearchApp.jsx";
 import PropertyLoanAgreementApp from "./PropertyLoanAgreementApp.jsx";
 import DashboardApp from "./DashboardApp.jsx";
+import EmailTemplatesApp from "./EmailTemplatesApp.jsx";
+import ProofOfIncomeApp from "./ProofOfIncomeApp.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -33,6 +35,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/find-documents" element={<DocumentSearchApp />} />
         <Route path="/property-loan-agreement" element={<PropertyLoanAgreementApp />} />
         <Route path="/dashboard" element={<DashboardApp />} />
+        <Route path="/email-templates" element={<EmailTemplatesApp />} />
+        <Route path="/proof-of-income" element={<ProofOfIncomeApp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

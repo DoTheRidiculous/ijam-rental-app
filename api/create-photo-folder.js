@@ -9,6 +9,8 @@ import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { listAllFilesRecursive } from "./_driveList.js";
 import { getOrCreatePersonFolder } from "./_personFolder.js";
+import { sendEmail } from "./_sendEmail.js";
+import { classify } from "./_documentTypes.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -17,8 +19,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { respondentName, signerEmail } = req.body || {};
+    const { respondentName, signerEmail, docType } = req.body || {};
     const name = (respondentName || "").trim();
+    const label = docType || "Item Photos";
     if (!name) {
       res.status(400).json({ error: "Missing respondent name." });
       return;
@@ -32,7 +35,7 @@ export default async function handler(req, res) {
     const auth = getOAuthClient();
     const drive = google.drive({ version: "v3", auth });
 
-    const folderTitle = `Item Photos - ${name}`;
+    const folderTitle = `${label} - ${name}`;
 
     // Reuse an existing folder for this person if one already exists,
     // even if it's been moved into a subfolder for organization.
@@ -61,24 +64,46 @@ export default async function handler(req, res) {
       folderId = folder.data.id;
       link = folder.data.webViewLink;
 
-      // Only needs to be set once — make it viewable by anyone with the link.
-      await drive.permissions.create({
-        fileId: folderId,
-        requestBody: { type: "anyone", role: "reader" },
-      });
+      // Only make it viewable by anyone with the link for non-sensitive
+      // uploads (like Item Photos). Sensitive types (like Proof of Income)
+      // stay private — only shared with specific people below.
+      const isSensitive = classify(`${label} - x`).sensitive;
+      if (!isSensitive) {
+        await drive.permissions.create({
+          fileId: folderId,
+          requestBody: { type: "anyone", role: "reader" },
+        });
+      }
 
-      const recipients = [orgEmail, ...(isValidEmail(signerEmail) ? [signerEmail] : [])];
+      const recipients = isValidEmail(signerEmail) ? [signerEmail] : [];
       for (const email of recipients) {
         try {
-          await drive.permissions.create({
-            fileId: folderId,
-            sendNotificationEmail: true,
-            emailMessage: "Photos are being uploaded to this shared folder.",
-            requestBody: { type: "user", role: "reader", emailAddress: email },
-          });
+          if (email !== orgEmail) {
+            await drive.permissions.create({
+              fileId: folderId,
+              sendNotificationEmail: true,
+              emailMessage: `Files are being uploaded to this shared folder (${label}).`,
+              requestBody: { type: "user", role: "reader", emailAddress: email },
+            });
+          } else {
+            await drive.permissions.create({
+              fileId: folderId,
+              requestBody: { type: "user", role: "reader", emailAddress: email },
+            });
+          }
         } catch (e) {
           // Non-fatal — the folder is already public-viewable regardless.
         }
+      }
+
+      try {
+        await sendEmail(auth, {
+          to: orgEmail,
+          subject: folderTitle,
+          body: `Files are being uploaded to this shared folder (${label}).\n\nView it here:\n${link}`,
+        });
+      } catch (e) {
+        console.error("Org notification email failed (folder was still created):", e);
       }
     }
 

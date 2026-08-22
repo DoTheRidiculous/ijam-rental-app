@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { getOrCreatePersonFolder } from "./_personFolder.js";
+import { sendEmail } from "./_sendEmail.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -48,14 +49,32 @@ export default async function handler(req, res) {
       },
     });
 
-    const recipients = [...new Set([signerEmail, orgEmail])];
-    for (const email of recipients) {
+    // Share with the external signer — Drive's notification works fine here
+    // since their account is different from the one the app is connected as.
+    if (signerEmail !== orgEmail) {
       await drive.permissions.create({
         fileId: docId,
         sendNotificationEmail: true,
         emailMessage: shareMessage || "Attached is your completed and signed document.",
-        requestBody: { type: "user", role: "commenter", emailAddress: email },
+        requestBody: { type: "user", role: "commenter", emailAddress: signerEmail },
       });
+    } else {
+      await drive.permissions.create({
+        fileId: docId,
+        requestBody: { type: "user", role: "commenter", emailAddress: signerEmail },
+      });
+    }
+
+    // Notify the org's own inbox with a real email — Drive can't notify an
+    // account of a file it already owns, so this uses Gmail directly.
+    try {
+      await sendEmail(auth, {
+        to: orgEmail,
+        subject: docTitle,
+        body: `${shareMessage || "A document was completed and signed."}\n\nView it here:\n${file.data.webViewLink}`,
+      });
+    } catch (e) {
+      console.error("Org notification email failed (document was still saved):", e);
     }
 
     res.status(200).json({ success: true, link: file.data.webViewLink, docId });

@@ -9,7 +9,7 @@ export const SLATE = "#595959";
 export const MIDGREY = "#8C8C8C";
 export const LIGHTGREY = "#D9D9D9";
 export const PALEGREY = "#F2F2F2";
-export const ORG_EMAIL = "admin@dotheridiculous.co";
+export const ORG_EMAIL = "admin@dotheridiculous.com";
 
 export function todayStr() {
   return new Date().toISOString().slice(0, 10);

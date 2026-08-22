@@ -11,6 +11,7 @@ import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { listAllFilesRecursive } from "./_driveList.js";
 import { getOrCreatePersonFolder } from "./_personFolder.js";
+import { sendEmail } from "./_sendEmail.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -80,18 +81,37 @@ export default async function handler(req, res) {
         requestBody: { requests: [{ insertText: { location: { index: 1 }, text: docText } }] },
       });
 
-      const recipients = [orgEmail, ...(isValidEmail(signerEmail) ? [signerEmail] : [])];
+      const recipients = isValidEmail(signerEmail) ? [signerEmail] : [];
       for (const email of recipients) {
         try {
-          await drive.permissions.create({
-            fileId: docId,
-            sendNotificationEmail: true,
-            emailMessage: shareMessage || "Attached is your completed document.",
-            requestBody: { type: "user", role: "commenter", emailAddress: email },
-          });
+          if (email !== orgEmail) {
+            await drive.permissions.create({
+              fileId: docId,
+              sendNotificationEmail: true,
+              emailMessage: shareMessage || "Attached is your completed document.",
+              requestBody: { type: "user", role: "commenter", emailAddress: email },
+            });
+          } else {
+            await drive.permissions.create({
+              fileId: docId,
+              requestBody: { type: "user", role: "commenter", emailAddress: email },
+            });
+          }
         } catch (e) {
           // Non-fatal
         }
+      }
+
+      // Notify the org's own inbox with a real email — Drive can't notify an
+      // account of a file it already owns, so this uses Gmail directly.
+      try {
+        await sendEmail(auth, {
+          to: orgEmail,
+          subject: docTitle,
+          body: `${shareMessage || "A new document was submitted."}\n\nView it here:\n${link}`,
+        });
+      } catch (e) {
+        console.error("Org notification email failed (document was still saved):", e);
       }
     }
 

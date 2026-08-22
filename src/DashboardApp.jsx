@@ -4,6 +4,7 @@ import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY } from "./formKit.jsx";
 
 const SHORT_LABELS = {
   "Rental Application": "Rental App",
+  "Proof of Income": "Income Docs",
   "Agreement to Lease": "Agreement",
   "Residential Lease": "Lease",
   "Move-In Questionnaire": "Questionnaire",
@@ -97,8 +98,8 @@ export default function DashboardApp() {
                           style={{ color: SLATE, borderBottom: `1px solid ${LIGHTGREY}` }}
                         >
                           {SHORT_LABELS[t] || t}
-                          {t === "Rental Application" && (
-                            <span title="Contains SSN — link opens directly in Drive, not shared publicly">
+                          {(t === "Rental Application" || t === "Proof of Income") && (
+                            <span title="Sensitive — link opens directly in Drive, not shared publicly">
                               <ShieldAlert size={11} style={{ display: "inline", marginLeft: 3, color: MIDGREY }} />
                             </span>
                           )}
