@@ -79,17 +79,6 @@ const DOC_TYPES = [
     ],
   },
   {
-    key: "item-photos",
-    label: "Item Photos",
-    shortLabel: "Item photos",
-    icon: Camera,
-    path: "/item-photos",
-    fields: [
-      { key: "tenant", label: "Tenant Name" },
-      { key: "email", label: "Tenant Email" },
-    ],
-  },
-  {
     key: "storage-donation-consent",
     label: "Storage & Donation Consent",
     shortLabel: "Storage & donation",
@@ -106,6 +95,17 @@ const DOC_TYPES = [
     shortLabel: "Move support",
     icon: Truck,
     path: "/move-support",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
+  {
+    key: "item-photos",
+    label: "Item Photos",
+    shortLabel: "Item photos",
+    icon: Camera,
+    path: "/item-photos",
     fields: [
       { key: "tenant", label: "Tenant Name" },
       { key: "email", label: "Tenant Email" },

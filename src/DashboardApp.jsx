@@ -19,6 +19,7 @@ export default function DashboardApp() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name"); // name | nextStep
 
   useEffect(() => {
     fetch("/api/dashboard-data")
@@ -33,10 +34,22 @@ export default function DashboardApp() {
 
   const filteredApplicants = useMemo(() => {
     if (!data) return [];
-    if (!query.trim()) return data.applicants;
-    const q = query.trim().toLowerCase();
-    return data.applicants.filter((a) => a.name.toLowerCase().includes(q));
-  }, [data, query]);
+    let list = data.applicants;
+    if (query.trim()) {
+      const q = query.trim().toLowerCase();
+      list = list.filter((a) => a.name.toLowerCase().includes(q));
+    }
+    if (sortBy === "nextStep") {
+      const order = data.sequentialTypes || [];
+      list = [...list].sort((a, b) => {
+        const ai = a.nextStep ? order.indexOf(a.nextStep) : order.length;
+        const bi = b.nextStep ? order.indexOf(b.nextStep) : order.length;
+        if (ai !== bi) return ai - bi;
+        return a.name.localeCompare(b.name);
+      });
+    }
+    return list;
+  }, [data, query, sortBy]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALEGREY }}>
@@ -48,7 +61,7 @@ export default function DashboardApp() {
         <p className="text-[12px] font-bold tracking-[0.15em] mb-1" style={{ color: MIDGREY }}>IJAM HOUSING</p>
         <h1 className="text-2xl font-bold mb-2" style={{ color: CHARCOAL }}>Progress Dashboard</h1>
         <p className="text-[14px] mb-6" style={{ color: SLATE }}>
-          Which forms each person has completed, pulled live from Drive. Click any checkmark to open that document.
+          Which forms each person has completed, pulled live from Drive, in the actual order they're needed. The <b>Next Step</b> column shows exactly what's missing for each person — click any checkmark to open that document.
         </p>
 
         {loading && (
@@ -66,15 +79,34 @@ export default function DashboardApp() {
 
         {data && (
           <>
-            <div className="relative mb-5" style={{ maxWidth: 320 }}>
-              <Search size={16} style={{ position: "absolute", left: 12, top: 12, color: MIDGREY }} />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Filter by name"
-                className="w-full rounded-md border pl-9 pr-3 py-2.5 text-[14px] outline-none"
-                style={{ borderColor: LIGHTGREY, color: CHARCOAL, backgroundColor: "#fff" }}
-              />
+            <div className="flex flex-wrap items-center gap-3 mb-5">
+              <div className="relative" style={{ maxWidth: 320, flex: "1 1 240px" }}>
+                <Search size={16} style={{ position: "absolute", left: 12, top: 12, color: MIDGREY }} />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Filter by name"
+                  className="w-full rounded-md border pl-9 pr-3 py-2.5 text-[14px] outline-none"
+                  style={{ borderColor: LIGHTGREY, color: CHARCOAL, backgroundColor: "#fff" }}
+                />
+              </div>
+              <div className="flex items-center gap-2 text-[13px]" style={{ color: SLATE }}>
+                <span className="font-semibold">Sort:</span>
+                <button
+                  onClick={() => setSortBy("name")}
+                  className="px-3 py-1.5 rounded-md font-semibold"
+                  style={sortBy === "name" ? { backgroundColor: CHARCOAL, color: "#fff" } : { backgroundColor: "#fff", border: `1px solid ${LIGHTGREY}`, color: SLATE }}
+                >
+                  Name
+                </button>
+                <button
+                  onClick={() => setSortBy("nextStep")}
+                  className="px-3 py-1.5 rounded-md font-semibold"
+                  style={sortBy === "nextStep" ? { backgroundColor: CHARCOAL, color: "#fff" } : { backgroundColor: "#fff", border: `1px solid ${LIGHTGREY}`, color: SLATE }}
+                >
+                  Next Step
+                </button>
+              </div>
             </div>
 
             {filteredApplicants.length === 0 ? (
@@ -89,6 +121,12 @@ export default function DashboardApp() {
                         style={{ color: SLATE, borderBottom: `1px solid ${LIGHTGREY}` }}
                       >
                         Name
+                      </th>
+                      <th
+                        className="text-[11px] font-bold px-3 py-3 text-left whitespace-nowrap"
+                        style={{ color: SLATE, borderBottom: `1px solid ${LIGHTGREY}` }}
+                      >
+                        Next Step
                       </th>
                       {data.types.map((t) => (
                         <th
@@ -115,6 +153,23 @@ export default function DashboardApp() {
                           style={{ color: CHARCOAL, backgroundColor: i % 2 === 1 ? PALEGREY : "#fff", borderBottom: `1px solid ${LIGHTGREY}` }}
                         >
                           {a.name}
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap" style={{ borderBottom: `1px solid ${LIGHTGREY}` }}>
+                          {a.nextStep ? (
+                            <span
+                              className="inline-block text-[12px] font-semibold px-2.5 py-1 rounded-full"
+                              style={{ backgroundColor: "#FAECE7", color: "#712B13" }}
+                            >
+                              {SHORT_LABELS[a.nextStep] || a.nextStep}
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-full"
+                              style={{ backgroundColor: "#EAF3DE", color: "#27500A" }}
+                            >
+                              <Check size={11} /> Complete
+                            </span>
+                          )}
                         </td>
                         {data.types.map((t) => {
                           const status = a.statuses[t];

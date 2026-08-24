@@ -53,75 +53,6 @@ Thanks,
 IJAM Housing`,
   },
   {
-    key: "storage-donation",
-    label: "Storage & Donation Consent",
-    icon: Gift,
-    path: "/storage-donation-consent",
-    subject: "A form for planning storage & donations — no rush",
-    body: `Hi {{name}},
-
-As we plan out your move, we know there may be some things you can't bring with you — whether that's because of space, or just things you're ready to let go of. We put together a short form so you can let us know what you'd like help storing, and what you're comfortable donating or giving away, entirely at your own pace and on your own terms:
-
-{{link}}
-
-A few things worth knowing:
-- Nothing gets given away without you specifically checking a box saying it's okay
-- This is just for planning — filling it out doesn't commit you to anything
-- You can come back and update your answers anytime if things change
-
-Take your time with this one — no rush.
-
-Warmly,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "move-support",
-    label: "Move Support Request",
-    icon: Truck,
-    path: "/move-support",
-    subject: "Quick form: Move support & timing",
-    body: `Hi {{name}},
-
-As your move gets closer, we'd like to know what kind of support might be helpful — whether that's a hand moving things, or boxes to pack with. Could you fill out this quick form when you get a chance?
-
-{{link}}
-
-It just asks:
-- Whether you could use help moving your things
-- The date you're hoping to start moving in
-- The earliest and latest days that would work for you
-- Whether you need boxes, and roughly how many/what sizes
-
-It only takes a couple minutes, and you can come back and update it anytime if your plans change.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "property-loan",
-    label: "Property Loan Agreement",
-    icon: Package,
-    path: "/property-loan-agreement",
-    subject: "Let's put your item loan in writing",
-    body: `Hi {{name}},
-
-Thank you so much for offering to loan an item for our use — that's a huge help. Since it's still your property and you'll want it back eventually, we want to put together a quick written agreement so everything is clear for both of us.
-
-{{link}}
-
-It covers a description of the item and its condition, the terms of the loan, and how we'll take care of it and return it — normal wear and tear is on us, and you keep ownership the whole time.
-
-Since it needs both of our signatures, it works best if we fill it out together — happy to hop on a call or meet up whenever's convenient for you.
-
-Thanks again for your generosity with this!
-
-Warmly,
-{{staff}}
-IJAM Housing`,
-  },
-  {
     key: "approved",
     label: "Application Approved",
     icon: ClipboardCheck,
@@ -157,42 +88,6 @@ We know this isn't the news you were hoping for, and we genuinely wish you the b
 
 Thank you again for your interest.
 
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "move-in-questionnaire",
-    label: "Move-In & Storage Questionnaire",
-    icon: Boxes,
-    path: "/move-in-questionnaire",
-    subject: "Quick form: Move-in planning",
-    body: `Hi {{name}},
-
-To help plan your move-in, could you fill out this short questionnaire? It covers timing, furniture, and any storage needs:
-
-{{link}}
-
-It only takes a few minutes, and you're welcome to come back and update your answers anytime if plans change.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "item-photos",
-    label: "Item Photos",
-    icon: Camera,
-    path: "/item-photos",
-    subject: "Please upload photos of your items",
-    body: `Hi {{name}},
-
-Could you take or upload a few photos of your larger furniture and belongings? This helps us know what to expect ahead of your move:
-
-{{link}}
-
-You can label each photo as you go — no rush, and you can add more anytime using the same link.
-
-Thanks,
 {{staff}}
 IJAM Housing`,
   },
@@ -255,6 +150,111 @@ Thanks,
 IJAM Housing`,
   },
   {
+    key: "move-in-questionnaire",
+    label: "Move-In & Storage Questionnaire",
+    icon: Boxes,
+    path: "/move-in-questionnaire",
+    subject: "Quick form: Move-in planning",
+    body: `Hi {{name}},
+
+To help plan your move-in, could you fill out this short questionnaire? It covers timing, furniture, and any storage needs:
+
+{{link}}
+
+It only takes a few minutes, and you're welcome to come back and update your answers anytime if plans change.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "storage-donation",
+    label: "Storage & Donation Consent",
+    icon: Gift,
+    path: "/storage-donation-consent",
+    subject: "A form for planning storage & donations — no rush",
+    body: `Hi {{name}},
+
+As we plan out your move, we know there may be some things you can't bring with you — whether that's because of space, or just things you're ready to let go of. We put together a short form so you can let us know what you'd like help storing, and what you're comfortable donating or giving away, entirely at your own pace and on your own terms:
+
+{{link}}
+
+A few things worth knowing:
+- Nothing gets given away without you specifically checking a box saying it's okay
+- This is just for planning — filling it out doesn't commit you to anything
+- You can come back and update your answers anytime if things change
+
+Take your time with this one — no rush.
+
+Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "move-support",
+    label: "Move Support Request",
+    icon: Truck,
+    path: "/move-support",
+    subject: "Quick form: Move support & timing",
+    body: `Hi {{name}},
+
+As your move gets closer, we'd like to know what kind of support might be helpful — whether that's a hand moving things, or boxes to pack with. Could you fill out this quick form when you get a chance?
+
+{{link}}
+
+It just asks:
+- Whether you could use help moving your things
+- The date you're hoping to start moving in
+- The earliest and latest days that would work for you
+- Whether you need boxes, and roughly how many/what sizes
+
+It only takes a couple minutes, and you can come back and update it anytime if your plans change.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "item-photos",
+    label: "Item Photos",
+    icon: Camera,
+    path: "/item-photos",
+    subject: "Please upload photos of your items",
+    body: `Hi {{name}},
+
+Could you take or upload a few photos of your larger furniture and belongings? This helps us know what to expect ahead of your move:
+
+{{link}}
+
+You can label each photo as you go — no rush, and you can add more anytime using the same link.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "property-loan",
+    label: "Property Loan Agreement",
+    icon: Package,
+    path: "/property-loan-agreement",
+    subject: "Let's put your item loan in writing",
+    body: `Hi {{name}},
+
+Thank you so much for offering to loan an item for our use — that's a huge help. Since it's still your property and you'll want it back eventually, we want to put together a quick written agreement so everything is clear for both of us.
+
+{{link}}
+
+It covers a description of the item and its condition, the terms of the loan, and how we'll take care of it and return it — normal wear and tear is on us, and you keep ownership the whole time.
+
+Since it needs both of our signatures, it works best if we fill it out together — happy to hop on a call or meet up whenever's convenient for you.
+
+Thanks again for your generosity with this!
+
+Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
     key: "baselane-setup",
     label: "Baselane Payment Setup",
     icon: CreditCard,
@@ -271,6 +271,7 @@ Warmly,
 {{staff}}
 IJAM Housing`,
   },
+
 ];
 
 function buildPrefilledLink(path, { name, email }) {
