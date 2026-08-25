@@ -2,8 +2,9 @@
 //
 // Lists every file across the Drive folders once, classifies each by type
 // and applicant name, and returns a completion matrix: for each person,
-// which of the 8 form types they have on file, when the most recent one was
-// submitted, and a link to it. This powers the staff progress dashboard.
+// which of the 9 form types they have on file, when the most recent one was
+// submitted, a link to it, and their computed "next step" based on the real
+// document sequence. This powers the staff progress dashboard/timeline.
 
 import { google } from "googleapis";
 import { getOAuthClient } from "./_googleAuth.js";
@@ -55,11 +56,16 @@ export default async function handler(req, res) {
     }
 
     const types = TYPE_PREFIXES.map((t) => t.type);
+    const sequentialTypes = TYPE_PREFIXES.filter((t) => t.sequential).map((t) => t.type);
+
     const result = Object.entries(applicants)
-      .map(([name, statuses]) => ({ name, statuses }))
+      .map(([name, statuses]) => {
+        const nextStep = sequentialTypes.find((t) => !statuses[t]) || null;
+        return { name, statuses, nextStep };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    res.status(200).json({ types, applicants: result });
+    res.status(200).json({ types, sequentialTypes, applicants: result });
   } catch (err) {
     console.error("dashboard-data error:", err);
     res.status(500).json({ error: err.message || "Something went wrong loading the dashboard." });

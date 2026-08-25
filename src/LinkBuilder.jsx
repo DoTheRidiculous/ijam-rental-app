@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Link2, Copy, Check, ArrowLeft, FileText, FileSignature, Home as HomeIcon,
-  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock, FileUp,
+  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock, FileUp, Wifi,
 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, INK } from "./formKit.jsx";
 
@@ -68,22 +68,27 @@ const DOC_TYPES = [
     ],
   },
   {
+    key: "move-in-packet",
+    label: "Move-In Packet",
+    shortLabel: "Move-in packet",
+    icon: Wifi,
+    path: "/move-in-packet",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+      { key: "wifi", label: "WiFi Network Name" },
+      { key: "wifipass", label: "WiFi Password" },
+      { key: "staffname", label: "Staff Contact Name" },
+      { key: "staffphone", label: "Staff Contact Phone" },
+      { key: "trash", label: "Trash/Recycling Day" },
+    ],
+  },
+  {
     key: "move-in-questionnaire",
     label: "Move-In Questionnaire",
     shortLabel: "Questionnaire",
     icon: Boxes,
     path: "/move-in-questionnaire",
-    fields: [
-      { key: "tenant", label: "Tenant Name" },
-      { key: "email", label: "Tenant Email" },
-    ],
-  },
-  {
-    key: "item-photos",
-    label: "Item Photos",
-    shortLabel: "Item photos",
-    icon: Camera,
-    path: "/item-photos",
     fields: [
       { key: "tenant", label: "Tenant Name" },
       { key: "email", label: "Tenant Email" },
@@ -106,6 +111,17 @@ const DOC_TYPES = [
     shortLabel: "Move support",
     icon: Truck,
     path: "/move-support",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+    ],
+  },
+  {
+    key: "item-photos",
+    label: "Item Photos",
+    shortLabel: "Item photos",
+    icon: Camera,
+    path: "/item-photos",
     fields: [
       { key: "tenant", label: "Tenant Name" },
       { key: "email", label: "Tenant Email" },

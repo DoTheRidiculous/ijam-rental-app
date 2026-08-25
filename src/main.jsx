@@ -16,6 +16,8 @@ import PropertyLoanAgreementApp from "./PropertyLoanAgreementApp.jsx";
 import DashboardApp from "./DashboardApp.jsx";
 import EmailTemplatesApp from "./EmailTemplatesApp.jsx";
 import ProofOfIncomeApp from "./ProofOfIncomeApp.jsx";
+import FaqApp from "./FaqApp.jsx";
+import MoveInPacketApp from "./MoveInPacketApp.jsx";
 import { StaffGate } from "./formKit.jsx";
 import "./index.css";
 
@@ -38,6 +40,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/dashboard" element={<StaffGate><DashboardApp /></StaffGate>} />
         <Route path="/email-templates" element={<StaffGate><EmailTemplatesApp /></StaffGate>} />
         <Route path="/proof-of-income" element={<ProofOfIncomeApp />} />
+        <Route path="/faq" element={<FaqApp />} />
+        <Route path="/move-in-packet" element={<MoveInPacketApp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   ArrowLeft, Mail, Send, Copy, Check, FileText, Gift, Truck, Package,
-  ClipboardCheck, FileSignature, CreditCard, ChevronRight, FileUp, Boxes, Camera, XCircle, Info,
+  ClipboardCheck, FileSignature, CreditCard, ChevronRight, FileUp, Boxes, Camera, XCircle, Info, Wifi,
 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, INK, useKnownNames } from "./formKit.jsx";
 
@@ -47,6 +47,139 @@ You can upload it here, PDFs or photos both work:
 This goes to a private folder that only our staff can see — it isn't a public link.
 
 Let me know if you have any questions about what qualifies, or if you need help getting documentation together.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "approved",
+    label: "Application Approved",
+    icon: ClipboardCheck,
+    subject: "You're approved! Here are your terms",
+    body: `Hi {{name}},
+
+Great news — your application has been approved! Here are the terms for the unit:
+
+- Monthly rent: [$amount], due on the [day] of each month
+- Security deposit: [$amount]
+
+The next step is the Agreement to Lease, which reserves the unit for you with these terms. I'll send that link separately once you've had a chance to look this over.
+
+Congratulations, and let me know if you have any questions about any of this!
+
+Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "denied",
+    label: "Application Not Approved",
+    icon: XCircle,
+    note: "If this decision is based on a credit report or background check, federal law (FCRA) requires a separate formal \"adverse action\" notice — naming the reporting agency, the applicant's right to a free copy of the report, and their right to dispute it. This template alone doesn't satisfy that requirement. Check with a professional if that applies here.",
+    subject: "Update on your rental application",
+    body: `Hi {{name}},
+
+Thank you for taking the time to apply, and for your patience during the review process.
+
+After careful review, we're not able to move forward with your application at this time.
+
+We know this isn't the news you were hoping for, and we genuinely wish you the best in your housing search. If you have any questions, please don't hesitate to reach out.
+
+Thank you again for your interest.
+
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "agreement-to-lease-only",
+    label: "Agreement to Lease",
+    icon: FileSignature,
+    path: "/agreement-to-lease",
+    subject: "Please complete: Agreement to Lease",
+    body: `Hi {{name}},
+
+Here's the link to complete your Agreement to Lease:
+
+{{link}}
+
+Let me know if anything comes up while you're filling it out.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "residential-lease-only",
+    label: "Residential Lease",
+    icon: FileSignature,
+    path: "/residential-lease",
+    subject: "Please complete: Residential Lease",
+    body: `Hi {{name}},
+
+Here's the link to complete your Residential Lease:
+
+{{link}}
+
+Let me know if anything comes up while you're filling it out.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "move-in-packet",
+    label: "Move-In Packet",
+    icon: Wifi,
+    path: "/move-in-packet",
+    subject: "Your move-in packet (WiFi info + welcome details)",
+    body: `Hi {{name}},
+
+Here's your move-in packet — it has your WiFi info and a quick walkthrough checklist to review and sign:
+
+{{link}}
+
+Let me know if you have any questions!
+
+Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "lease-documents",
+    label: "Agreement to Lease + Residential Lease",
+    icon: FileSignature,
+    paths: ["/agreement-to-lease", "/residential-lease"],
+    subject: "Two quick things to finish up your lease",
+    body: `Hi {{name}},
+
+A couple of things to finish up now that your terms are confirmed:
+
+1) The Agreement to Lease:
+{{link1}}
+
+2) The full Residential Lease, which has all the details of your tenancy:
+{{link2}}
+
+Both only take a few minutes. Let me know if anything comes up while you're filling them out!
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "move-in-questionnaire",
+    label: "Move-In & Storage Questionnaire",
+    icon: Boxes,
+    path: "/move-in-questionnaire",
+    subject: "Quick form: Move-in planning",
+    body: `Hi {{name}},
+
+To help plan your move-in, could you fill out this short questionnaire? It covers timing, furniture, and any storage needs:
+
+{{link}}
+
+It only takes a few minutes, and you're welcome to come back and update your answers anytime if plans change.
 
 Thanks,
 {{staff}}
@@ -100,6 +233,24 @@ Thanks,
 IJAM Housing`,
   },
   {
+    key: "item-photos",
+    label: "Item Photos",
+    icon: Camera,
+    path: "/item-photos",
+    subject: "Please upload photos of your items",
+    body: `Hi {{name}},
+
+Could you take or upload a few photos of your larger furniture and belongings? This helps us know what to expect ahead of your move:
+
+{{link}}
+
+You can label each photo as you go — no rush, and you can add more anytime using the same link.
+
+Thanks,
+{{staff}}
+IJAM Housing`,
+  },
+  {
     key: "property-loan",
     label: "Property Loan Agreement",
     icon: Package,
@@ -122,139 +273,6 @@ Warmly,
 IJAM Housing`,
   },
   {
-    key: "approved",
-    label: "Application Approved",
-    icon: ClipboardCheck,
-    subject: "You're approved! Here are your terms",
-    body: `Hi {{name}},
-
-Great news — your application has been approved! Here are the terms for the unit:
-
-- Monthly rent: [$amount], due on the [day] of each month
-- Security deposit: [$amount]
-
-The next step is the Agreement to Lease, which reserves the unit for you with these terms. I'll send that link separately once you've had a chance to look this over.
-
-Congratulations, and let me know if you have any questions about any of this!
-
-Warmly,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "denied",
-    label: "Application Not Approved",
-    icon: XCircle,
-    note: "If this decision is based on a credit report or background check, federal law (FCRA) requires a separate formal \"adverse action\" notice — naming the reporting agency, the applicant's right to a free copy of the report, and their right to dispute it. This template alone doesn't satisfy that requirement. Check with a professional if that applies here.",
-    subject: "Update on your rental application",
-    body: `Hi {{name}},
-
-Thank you for taking the time to apply, and for your patience during the review process.
-
-After careful review, we're not able to move forward with your application at this time.
-
-We know this isn't the news you were hoping for, and we genuinely wish you the best in your housing search. If you have any questions, please don't hesitate to reach out.
-
-Thank you again for your interest.
-
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "move-in-questionnaire",
-    label: "Move-In & Storage Questionnaire",
-    icon: Boxes,
-    path: "/move-in-questionnaire",
-    subject: "Quick form: Move-in planning",
-    body: `Hi {{name}},
-
-To help plan your move-in, could you fill out this short questionnaire? It covers timing, furniture, and any storage needs:
-
-{{link}}
-
-It only takes a few minutes, and you're welcome to come back and update your answers anytime if plans change.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "item-photos",
-    label: "Item Photos",
-    icon: Camera,
-    path: "/item-photos",
-    subject: "Please upload photos of your items",
-    body: `Hi {{name}},
-
-Could you take or upload a few photos of your larger furniture and belongings? This helps us know what to expect ahead of your move:
-
-{{link}}
-
-You can label each photo as you go — no rush, and you can add more anytime using the same link.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "agreement-to-lease-only",
-    label: "Agreement to Lease",
-    icon: FileSignature,
-    path: "/agreement-to-lease",
-    subject: "Please complete: Agreement to Lease",
-    body: `Hi {{name}},
-
-Here's the link to complete your Agreement to Lease:
-
-{{link}}
-
-Let me know if anything comes up while you're filling it out.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "residential-lease-only",
-    label: "Residential Lease",
-    icon: FileSignature,
-    path: "/residential-lease",
-    subject: "Please complete: Residential Lease",
-    body: `Hi {{name}},
-
-Here's the link to complete your Residential Lease:
-
-{{link}}
-
-Let me know if anything comes up while you're filling it out.
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
-    key: "lease-documents",
-    label: "Agreement to Lease + Residential Lease",
-    icon: FileSignature,
-    paths: ["/agreement-to-lease", "/residential-lease"],
-    subject: "Two quick things to finish up your lease",
-    body: `Hi {{name}},
-
-A couple of things to finish up now that your terms are confirmed:
-
-1) The Agreement to Lease:
-{{link1}}
-
-2) The full Residential Lease, which has all the details of your tenancy:
-{{link2}}
-
-Both only take a few minutes. Let me know if anything comes up while you're filling them out!
-
-Thanks,
-{{staff}}
-IJAM Housing`,
-  },
-  {
     key: "baselane-setup",
     label: "Baselane Payment Setup",
     icon: CreditCard,
@@ -271,6 +289,7 @@ Warmly,
 {{staff}}
 IJAM Housing`,
   },
+
 ];
 
 function buildPrefilledLink(path, { name, email }) {

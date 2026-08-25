@@ -1,7 +1,7 @@
 import React from "react";
 import {
   FileText, FileSignature, Home as HomeIcon, Link2, Boxes, Camera, Search, Gift, Truck,
-  FileSearch, Package, LayoutDashboard, Mail, FileUp,
+  FileSearch, Package, LayoutDashboard, Mail, FileUp, HelpCircle, Wifi,
 } from "lucide-react";
 import { CHARCOAL, MIDGREY, LIGHTGREY, PALEGREY, INK } from "./formKit.jsx";
 
@@ -22,6 +22,7 @@ const SECTIONS = [
     links: [
       { href: "/agreement-to-lease", title: "Agreement to Lease", icon: FileSignature },
       { href: "/residential-lease", title: "Residential Lease", icon: HomeIcon },
+      { href: "/move-in-packet", title: "Move-In Packet", icon: Wifi },
     ],
   },
   {
@@ -30,9 +31,9 @@ const SECTIONS = [
     tint: "#E6F1FB",
     links: [
       { href: "/move-in-questionnaire", title: "Move-In Questionnaire", icon: Boxes },
-      { href: "/item-photos", title: "Item Photos", icon: Camera },
       { href: "/storage-donation-consent", title: "Storage & Donation Consent", icon: Gift },
       { href: "/move-support", title: "Move Support Request", icon: Truck },
+      { href: "/item-photos", title: "Item Photos", icon: Camera },
     ],
   },
   {
@@ -41,6 +42,7 @@ const SECTIONS = [
     tint: "#EEEDFE",
     links: [
       { href: "/property-loan-agreement", title: "Property Loan Agreement", icon: Package },
+      { href: "/faq", title: "Frequently Asked Questions", icon: HelpCircle },
     ],
   },
 ];
