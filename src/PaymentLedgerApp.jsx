@@ -46,7 +46,7 @@ export default function PaymentLedgerApp() {
     setLedger(null);
     setViewMonth(currentMonthKey());
     try {
-      const res = await fetch(`/api/get-ledger?name=${encodeURIComponent(name)}`);
+      const res = await fetch(`/api/ledger?name=${encodeURIComponent(name)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not load ledger.");
       setLedger(data.ledger);
@@ -63,7 +63,7 @@ export default function PaymentLedgerApp() {
     setSaving(true);
     setError("");
     try {
-      const res = await fetch("/api/save-ledger", {
+      const res = await fetch("/api/ledger", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: activeName, ledger: updatedLedger }),

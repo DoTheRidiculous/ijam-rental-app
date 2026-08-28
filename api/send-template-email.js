@@ -4,8 +4,8 @@
 // app, using the same Gmail connection already set up for org
 // notifications.
 
-import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
-import { sendEmail } from "./_sendEmail.js";
+import { getOAuthClient, isValidEmail } from "../lib/googleAuth.js";
+import { sendEmail } from "../lib/sendEmail.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

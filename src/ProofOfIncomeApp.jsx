@@ -104,10 +104,11 @@ export default function ProofOfIncomeApp() {
     setProgress({ done: 0, total: docs.length });
 
     try {
-      const folderRes = await fetch("/api/create-photo-folder", {
+      const folderRes = await fetch("/api/photo-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "create-folder",
           respondentName: form.respondentName,
           signerEmail: form.respondentEmail,
           docType: "Proof of Income",
@@ -125,10 +126,10 @@ export default function ProofOfIncomeApp() {
         const fileName = `${safeLabel} - ${todayStr()} (${Date.now()}-${i}).${ext}`;
         const mimeType = isPdf ? "application/pdf" : doc.isImage ? "image/jpeg" : (doc.file.type || "application/octet-stream");
 
-        const uploadRes = await fetch("/api/upload-photo", {
+        const uploadRes = await fetch("/api/photo-upload", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folderId: folderData.folderId, fileName, imageBase64: dataUrl, mimeType }),
+          body: JSON.stringify({ action: "upload", folderId: folderData.folderId, fileName, imageBase64: dataUrl, mimeType }),
         });
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || `Could not upload ${safeLabel}.`);

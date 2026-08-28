@@ -1,8 +1,8 @@
 import { google } from "googleapis";
-import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
-import { getOrCreatePersonFolder } from "./_personFolder.js";
-import { sendEmail } from "./_sendEmail.js";
-import { buildFormattedRequests } from "./_docFormatting.js";
+import { getOAuthClient, isValidEmail } from "../lib/googleAuth.js";
+import { getOrCreatePersonFolder } from "../lib/personFolder.js";
+import { sendEmail } from "../lib/sendEmail.js";
+import { buildFormattedRequests } from "../lib/docFormatting.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

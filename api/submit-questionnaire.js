@@ -8,10 +8,10 @@
 // submission should remain a fixed, dated record.
 
 import { google } from "googleapis";
-import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
-import { listAllFilesRecursive } from "./_driveList.js";
-import { getOrCreatePersonFolder } from "./_personFolder.js";
-import { sendEmail } from "./_sendEmail.js";
+import { getOAuthClient, isValidEmail } from "../lib/googleAuth.js";
+import { listAllFilesRecursive } from "../lib/driveList.js";
+import { getOrCreatePersonFolder } from "../lib/personFolder.js";
+import { sendEmail } from "../lib/sendEmail.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

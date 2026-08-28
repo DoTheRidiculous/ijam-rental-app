@@ -20,7 +20,7 @@ export default function FindPhotos() {
     setError("");
     setResults(null);
     try {
-      const res = await fetch(`/api/search-all-documents?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/document-search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Search failed.");
       const folders = (data.results || []).filter((r) => r.type === "Item Photos" && r.isFolder);

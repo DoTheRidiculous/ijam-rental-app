@@ -77,10 +77,10 @@ export default function PhotoUploadApp() {
     setProgress({ done: 0, total: photos.length });
 
     try {
-      const folderRes = await fetch("/api/create-photo-folder", {
+      const folderRes = await fetch("/api/photo-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ respondentName: form.respondentName, signerEmail: form.respondentEmail }),
+        body: JSON.stringify({ action: "create-folder", respondentName: form.respondentName, signerEmail: form.respondentEmail }),
       });
       const folderData = await folderRes.json();
       if (!folderRes.ok) throw new Error(folderData.error || "Could not create the photo folder.");
@@ -91,10 +91,10 @@ export default function PhotoUploadApp() {
         const safeLabel = (photo.label || `photo-${i + 1}`).replace(/[^\w\- ]+/g, "").trim() || `photo-${i + 1}`;
         const fileName = `${safeLabel} - ${todayStr()} (${Date.now()}-${i}).jpg`;
 
-        const uploadRes = await fetch("/api/upload-photo", {
+        const uploadRes = await fetch("/api/photo-upload", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folderId: folderData.folderId, fileName, imageBase64: compressed }),
+          body: JSON.stringify({ action: "upload", folderId: folderData.folderId, fileName, imageBase64: compressed }),
         });
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || `Could not upload photo ${i + 1}.`);

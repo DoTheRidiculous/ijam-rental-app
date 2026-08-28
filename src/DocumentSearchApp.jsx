@@ -34,7 +34,7 @@ export default function DocumentSearchApp() {
     setResults(null);
     setPacketLink(null);
     try {
-      const res = await fetch(`/api/search-all-documents?q=${encodeURIComponent(query.trim())}`);
+      const res = await fetch(`/api/document-search?q=${encodeURIComponent(query.trim())}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Search failed.");
       setResults(data.results);
@@ -61,7 +61,7 @@ export default function DocumentSearchApp() {
     setError("");
     try {
       const items = shareableResults.map((r) => ({ id: r.id, title: r.name, link: r.webViewLink }));
-      const res = await fetch("/api/create-document-packet", {
+      const res = await fetch("/api/document-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: query.trim(), items }),

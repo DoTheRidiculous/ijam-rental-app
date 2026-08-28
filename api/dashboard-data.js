@@ -7,9 +7,9 @@
 // document sequence. This powers the staff progress dashboard/timeline.
 
 import { google } from "googleapis";
-import { getOAuthClient } from "./_googleAuth.js";
-import { TYPE_PREFIXES, classify, extractName } from "./_documentTypes.js";
-import { listAllFilesRecursive } from "./_driveList.js";
+import { getOAuthClient } from "../lib/googleAuth.js";
+import { TYPE_PREFIXES, classify, extractName } from "../lib/documentTypes.js";
+import { listAllFilesRecursive } from "../lib/driveList.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
