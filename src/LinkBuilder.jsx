@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Link2, Copy, Check, ArrowLeft, FileText, FileSignature, Home as HomeIcon,
-  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock, FileUp, Wifi,
+  Boxes, Camera, Gift, Truck, Package, MapPin, DollarSign, Calendar, User, Mail, Phone, Clock, FileUp, Wifi, ClipboardCheck,
 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, INK } from "./formKit.jsx";
 
@@ -81,6 +81,18 @@ const DOC_TYPES = [
       { key: "staffname", label: "Staff Contact Name" },
       { key: "staffphone", label: "Staff Contact Phone" },
       { key: "trash", label: "Trash/Recycling Day" },
+    ],
+  },
+  {
+    key: "property-condition-report",
+    label: "Property Condition Report",
+    shortLabel: "Condition report",
+    icon: ClipboardCheck,
+    path: "/property-condition-report",
+    fields: [
+      { key: "tenant", label: "Tenant Name" },
+      { key: "email", label: "Tenant Email" },
+      { key: "unit", label: "Unit Number" },
     ],
   },
   {

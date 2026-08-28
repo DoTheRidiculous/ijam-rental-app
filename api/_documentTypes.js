@@ -1,6 +1,6 @@
 // api/_documentTypes.js
 //
-// Single source of truth for how to recognize which of our 9 form types a
+// Single source of truth for how to recognize which of our 10 form types a
 // Drive file/folder belongs to, and how to pull the person's name out of its
 // title. Used by list-known-names, search-all-documents, dashboard-data, and
 // the Dashboard's timeline view, so they can never drift out of sync with
@@ -18,6 +18,7 @@ export const TYPE_PREFIXES = [
   { type: "Agreement to Lease", prefix: "Agreement to Lease - ", sensitive: false, hasDate: true, sequential: true },
   { type: "Residential Lease", prefix: "Residential Lease - ", sensitive: false, hasDate: true, sequential: true },
   { type: "Move-In Packet", prefix: "Move-In Packet - ", sensitive: false, hasDate: true, sequential: true },
+  { type: "Property Condition Report", prefix: "Property Condition Report - ", sensitive: false, hasDate: true, sequential: true },
   { type: "Move-In Questionnaire", prefix: "Move-In Questionnaire - ", sensitive: false, hasDate: false, sequential: true },
   { type: "Item Storage & Donation Consent", prefix: "Item Storage & Donation Consent - ", sensitive: false, hasDate: false, sequential: true },
   { type: "Move Support Request", prefix: "Move Support Request - ", sensitive: false, hasDate: false, sequential: true },

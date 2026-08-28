@@ -1,7 +1,7 @@
 import React from "react";
 import {
   FileText, FileSignature, Home as HomeIcon, Link2, Boxes, Camera, Search, Gift, Truck,
-  FileSearch, Package, LayoutDashboard, Mail, FileUp, HelpCircle, Wifi,
+  FileSearch, Package, LayoutDashboard, Mail, FileUp, HelpCircle, Wifi, ClipboardCheck, Receipt,
 } from "lucide-react";
 import { CHARCOAL, MIDGREY, LIGHTGREY, PALEGREY, INK } from "./formKit.jsx";
 
@@ -23,6 +23,7 @@ const SECTIONS = [
       { href: "/agreement-to-lease", title: "Agreement to Lease", icon: FileSignature },
       { href: "/residential-lease", title: "Residential Lease", icon: HomeIcon },
       { href: "/move-in-packet", title: "Move-In Packet", icon: Wifi },
+      { href: "/property-condition-report", title: "Property Condition Report", icon: ClipboardCheck },
     ],
   },
   {
@@ -49,6 +50,7 @@ const SECTIONS = [
 
 const STAFF_LINKS = [
   { href: "/dashboard", title: "Progress Dashboard", icon: LayoutDashboard },
+  { href: "/payment-ledger", title: "Payment Ledger", icon: Receipt },
   { href: "/email-templates", title: "Email Templates", icon: Mail },
   { href: "/create-link", title: "Create a Pre-Filled Link", icon: Link2 },
   { href: "/find-photos", title: "Find an Applicant's Photos", icon: Search },

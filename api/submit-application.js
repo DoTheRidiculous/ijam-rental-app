@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import { getOAuthClient, isValidEmail } from "./_googleAuth.js";
 import { getOrCreatePersonFolder } from "./_personFolder.js";
 import { sendEmail } from "./_sendEmail.js";
+import { buildFormattedRequests } from "./_docFormatting.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
     await docs.documents.batchUpdate({
       documentId: docId,
       requestBody: {
-        requests: [{ insertText: { location: { index: 1 }, text: docText } }],
+        requests: buildFormattedRequests(docText),
       },
     });
 

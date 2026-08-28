@@ -8,6 +8,7 @@ const SHORT_LABELS = {
   "Agreement to Lease": "Agreement",
   "Residential Lease": "Lease",
   "Move-In Packet": "Move-In Pkt",
+  "Property Condition Report": "Condition Rpt",
   "Move-In Questionnaire": "Questionnaire",
   "Item Storage & Donation Consent": "Storage",
   "Move Support Request": "Move Support",

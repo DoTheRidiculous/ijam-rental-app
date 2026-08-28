@@ -92,6 +92,32 @@ Thank you again for your interest.
 IJAM Housing`,
   },
   {
+    key: "approved-lease-deposit",
+    label: "Approved + Lease + Venmo Deposit",
+    icon: ClipboardCheck,
+    path: "/residential-lease",
+    subject: "You're approved! Next steps + deposit info",
+    body: `Hi {{name}},
+
+Great news — your application has been approved!
+
+Next step is signing your Residential Lease:
+
+{{link}}
+
+SECURITY DEPOSIT VIA VENMO
+Please send your security deposit to our Venmo: [@YourVenmoUsername]
+- Double check the name/photo matches ours before sending
+- Include a note on the payment: "Security Deposit - [Unit Number]"
+- Once sent, let us know and we'll confirm receipt and send you a receipt for your records
+
+Let me know if you have any questions about any of this — congratulations again!
+
+Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
     key: "agreement-to-lease-only",
     label: "Agreement to Lease",
     icon: FileSignature,
@@ -135,13 +161,31 @@ IJAM Housing`,
     subject: "Your move-in packet (WiFi info + welcome details)",
     body: `Hi {{name}},
 
-Here's your move-in packet — it has your WiFi info and a quick walkthrough checklist to review and sign:
+Here's your move-in packet — it has your WiFi info and a few welcome details, plus a spot to sign confirming you received it:
 
 {{link}}
 
 Let me know if you have any questions!
 
 Warmly,
+{{staff}}
+IJAM Housing`,
+  },
+  {
+    key: "property-condition-report",
+    label: "Property Condition Report",
+    icon: ClipboardCheck,
+    path: "/property-condition-report",
+    subject: "Move-in condition walkthrough",
+    body: `Hi {{name}},
+
+As part of move-in, we'll walk through the unit together and record its condition room by room — this protects both of us if there's ever a question at move-out.
+
+{{link}}
+
+We'll fill this out together and both sign at the end.
+
+Thanks,
 {{staff}}
 IJAM Housing`,
   },

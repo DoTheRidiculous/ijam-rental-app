@@ -18,6 +18,8 @@ import EmailTemplatesApp from "./EmailTemplatesApp.jsx";
 import ProofOfIncomeApp from "./ProofOfIncomeApp.jsx";
 import FaqApp from "./FaqApp.jsx";
 import MoveInPacketApp from "./MoveInPacketApp.jsx";
+import PropertyConditionReportApp from "./PropertyConditionReportApp.jsx";
+import PaymentLedgerApp from "./PaymentLedgerApp.jsx";
 import { StaffGate } from "./formKit.jsx";
 import "./index.css";
 
@@ -42,6 +44,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/proof-of-income" element={<ProofOfIncomeApp />} />
         <Route path="/faq" element={<FaqApp />} />
         <Route path="/move-in-packet" element={<MoveInPacketApp />} />
+        <Route path="/property-condition-report" element={<PropertyConditionReportApp />} />
+        <Route path="/payment-ledger" element={<StaffGate><PaymentLedgerApp /></StaffGate>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
