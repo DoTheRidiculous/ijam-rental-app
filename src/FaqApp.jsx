@@ -8,10 +8,6 @@ const FAQS = [
     a: "This is a standard part of the application process for any rental — it lets us verify your identity and rental history, the same way any landlord would. Your Rental Application is stored privately and is never shared publicly.",
   },
   {
-    q: "Have you helped other people with housing like this before?",
-    a: "[Staff: fill in a real answer here about IJAM Housing's track record — this is one applicants specifically asked about trust/legitimacy, worth answering honestly and specifically.]",
-  },
-  {
     q: "What payment methods can I use for my security deposit or rent?",
     a: "Venmo, Cash App, Zelle, or a checking account transfer all work. Let us know which one works best for you.",
   },

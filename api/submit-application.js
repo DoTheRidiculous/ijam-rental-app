@@ -3,6 +3,7 @@ import { getOAuthClient, isValidEmail } from "../lib/googleAuth.js";
 import { getOrCreatePersonFolder } from "../lib/personFolder.js";
 import { sendEmail } from "../lib/sendEmail.js";
 import { buildFormattedRequests } from "../lib/docFormatting.js";
+import { getOrgNotifyList } from "../lib/orgRecipients.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -55,10 +56,22 @@ export default async function handler(req, res) {
     if (signerEmail !== orgEmail) {
       await drive.permissions.create({
         fileId: docId,
-        sendNotificationEmail: true,
-        emailMessage: shareMessage || "Attached is your completed and signed document.",
         requestBody: { type: "user", role: "commenter", emailAddress: signerEmail },
       });
+
+      // Send the actual content directly in a real email — a bare Drive
+      // share notification requires clicking through and signing into a
+      // matching Google account, which is a bad experience for something
+      // like a WiFi password someone needs to read right away.
+      try {
+        await sendEmail(auth, {
+          to: signerEmail,
+          subject: docTitle,
+          body: `${docText}\n\nView the saved copy here:\n${file.data.webViewLink}`,
+        });
+      } catch (e) {
+        console.error("Signer email failed (document was still saved and shared via Drive):", e);
+      }
     } else {
       await drive.permissions.create({
         fileId: docId,
@@ -70,7 +83,7 @@ export default async function handler(req, res) {
     // account of a file it already owns, so this uses Gmail directly.
     try {
       await sendEmail(auth, {
-        to: orgEmail,
+        to: getOrgNotifyList(),
         subject: docTitle,
         body: `${shareMessage || "A document was completed and signed."}\n\nView it here:\n${file.data.webViewLink}`,
       });

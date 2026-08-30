@@ -12,6 +12,7 @@ import { getOAuthClient, isValidEmail } from "../lib/googleAuth.js";
 import { listAllFilesRecursive } from "../lib/driveList.js";
 import { getOrCreatePersonFolder } from "../lib/personFolder.js";
 import { sendEmail } from "../lib/sendEmail.js";
+import { getOrgNotifyList } from "../lib/orgRecipients.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -80,39 +81,43 @@ export default async function handler(req, res) {
         documentId: docId,
         requestBody: { requests: [{ insertText: { location: { index: 1 }, text: docText } }] },
       });
+    }
 
-      const recipients = isValidEmail(signerEmail) ? [signerEmail] : [];
-      for (const email of recipients) {
-        try {
-          if (email !== orgEmail) {
-            await drive.permissions.create({
-              fileId: docId,
-              sendNotificationEmail: true,
-              emailMessage: shareMessage || "Attached is your completed document.",
-              requestBody: { type: "user", role: "commenter", emailAddress: email },
-            });
-          } else {
-            await drive.permissions.create({
-              fileId: docId,
-              requestBody: { type: "user", role: "commenter", emailAddress: email },
-            });
-          }
-        } catch (e) {
-          // Non-fatal
-        }
-      }
-
-      // Notify the org's own inbox with a real email — Drive can't notify an
-      // account of a file it already owns, so this uses Gmail directly.
+    // Share with the signer and send them the actual content directly —
+    // fires on both new submissions and updates, not just the first one. A
+    // bare Drive share notification requires clicking through and signing
+    // into a matching Google account, which is a bad experience for
+    // something someone needs to read right away.
+    if (isValidEmail(signerEmail) && signerEmail !== orgEmail) {
       try {
-        await sendEmail(auth, {
-          to: orgEmail,
-          subject: docTitle,
-          body: `${shareMessage || "A new document was submitted."}\n\nView it here:\n${link}`,
+        await drive.permissions.create({
+          fileId: docId,
+          requestBody: { type: "user", role: "commenter", emailAddress: signerEmail },
         });
       } catch (e) {
-        console.error("Org notification email failed (document was still saved):", e);
+        // Non-fatal — likely already shared.
       }
+      try {
+        await sendEmail(auth, {
+          to: signerEmail,
+          subject: docTitle,
+          body: `${docText}\n\nView the saved copy here:\n${link}`,
+        });
+      } catch (e) {
+        console.error("Signer email failed (document was still saved and shared via Drive):", e);
+      }
+    }
+
+    // Notify the org's own inbox with a real email — Drive can't notify an
+    // account of a file it already owns, so this uses Gmail directly.
+    try {
+      await sendEmail(auth, {
+        to: getOrgNotifyList(),
+        subject: docTitle,
+        body: `${shareMessage || (updated ? "A document was updated." : "A new document was submitted.")}\n\nView it here:\n${link}`,
+      });
+    } catch (e) {
+      console.error("Org notification email failed (document was still saved):", e);
     }
 
     res.status(200).json({ success: true, link, docId, updated });

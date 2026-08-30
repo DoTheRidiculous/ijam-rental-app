@@ -15,6 +15,7 @@ import { listAllFilesRecursive } from "../lib/driveList.js";
 import { getOrCreatePersonFolder } from "../lib/personFolder.js";
 import { sendEmail } from "../lib/sendEmail.js";
 import { classify } from "../lib/documentTypes.js";
+import { getOrgNotifyList } from "../lib/orgRecipients.js";
 
 export const config = {
   api: {
@@ -100,7 +101,7 @@ async function handleCreateFolder(req, res, auth) {
 
     try {
       await sendEmail(auth, {
-        to: orgEmail,
+        to: getOrgNotifyList(),
         subject: folderTitle,
         body: `Files are being uploaded to this shared folder (${label}).\n\nView it here:\n${link}`,
       });
