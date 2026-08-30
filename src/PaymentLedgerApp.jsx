@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { ArrowLeft, Receipt, Search, Plus, Zap, Wifi, Loader2, AlertTriangle, ChevronLeft, ChevronRight, Mail, Check } from "lucide-react";
+import { ArrowLeft, Receipt, Search, Plus, Zap, Wifi, Loader2, AlertTriangle, ChevronLeft, ChevronRight, Mail, Check, Trash2 } from "lucide-react";
 import { CHARCOAL, SLATE, MIDGREY, LIGHTGREY, PALEGREY, INK, useKnownNames, todayStr } from "./formKit.jsx";
 
 const TYPE_COLORS = {
@@ -39,6 +39,7 @@ export default function PaymentLedgerApp() {
   const knownNames = useKnownNames();
 
   const [newPayment, setNewPayment] = useState({ date: todayStr(), amount: "", appliesTo: "Rent", method: "Zelle", note: "" });
+  const [deletingId, setDeletingId] = useState(null);
 
   const loadLedger = async (name) => {
     setLoading(true);
@@ -125,6 +126,12 @@ export default function PaymentLedgerApp() {
     }
 
     setNewPayment({ date: todayStr(), amount: "", appliesTo: "Rent", method: "Zelle", note: "" });
+  };
+
+  const deletePayment = async (id) => {
+    setDeletingId(null);
+    const updated = { ...ledger, payments: (ledger.payments || []).filter((p) => p.id !== id) };
+    await saveLedger(updated);
   };
 
   const paidInMonth = (monthKey) => {
@@ -394,11 +401,13 @@ export default function PaymentLedgerApp() {
                       <th className="px-4 py-2.5 font-semibold" style={{ color: SLATE }}>Applies to</th>
                       <th className="px-4 py-2.5 font-semibold" style={{ color: SLATE }}>Method</th>
                       <th className="px-4 py-2.5 font-semibold" style={{ color: SLATE }}>Note</th>
+                      <th className="px-4 py-2.5"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {ledger.payments.map((p) => {
                       const colors = TYPE_COLORS[p.appliesTo] || TYPE_COLORS.Other;
+                      const confirming = deletingId === p.id;
                       return (
                         <tr key={p.id} style={{ borderTop: `1px solid ${LIGHTGREY}` }}>
                           <td className="px-4 py-2.5" style={{ color: INK }}>{p.date}</td>
@@ -406,6 +415,19 @@ export default function PaymentLedgerApp() {
                           <td className="px-4 py-2.5"><span className="text-[12px] px-2 py-0.5 rounded" style={{ backgroundColor: colors.bg, color: colors.text }}>{p.appliesTo}</span></td>
                           <td className="px-4 py-2.5" style={{ color: SLATE }}>{p.method}</td>
                           <td className="px-4 py-2.5" style={{ color: SLATE }}>{p.note || "—"}</td>
+                          <td className="px-4 py-2.5 text-right whitespace-nowrap">
+                            {confirming ? (
+                              <span className="inline-flex items-center gap-2">
+                                <span className="text-[12px]" style={{ color: SLATE }}>Delete?</span>
+                                <button onClick={() => deletePayment(p.id)} className="text-[12px] font-semibold px-2 py-1 rounded" style={{ backgroundColor: "#712B13", color: "#fff" }}>Yes</button>
+                                <button onClick={() => setDeletingId(null)} className="text-[12px] font-semibold px-2 py-1 rounded" style={{ backgroundColor: PALEGREY, color: SLATE }}>Cancel</button>
+                              </span>
+                            ) : (
+                              <button onClick={() => setDeletingId(p.id)} className="p-1.5 rounded-md" style={{ color: MIDGREY }} title="Delete this entry">
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       );
                     })}
