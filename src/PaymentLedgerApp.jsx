@@ -227,7 +227,10 @@ export default function PaymentLedgerApp() {
               <input
                 value={ledger.tenantEmail}
                 onChange={(e) => updateField("tenantEmail", e.target.value)}
-                onBlur={saveField}
+                onBlur={() => {
+                  saveField();
+                  if (ledger.tenantEmail && ledger.tenantEmail.includes("@")) setSendReceipt(true);
+                }}
                 type="email"
                 placeholder="tenant@email.com"
                 className="w-full rounded-md border px-3 py-2 text-[13px] outline-none"
