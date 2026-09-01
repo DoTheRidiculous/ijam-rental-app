@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { to, subject, body } = req.body || {};
+    const { to, subject, body, html } = req.body || {};
     if (!isValidEmail(to)) {
       res.status(400).json({ error: "A valid recipient email is required." });
       return;
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     }
 
     const auth = getOAuthClient();
-    await sendEmail(auth, { to, subject, body });
+    await sendEmail(auth, { to, subject, body, html });
 
     res.status(200).json({ success: true });
   } catch (err) {

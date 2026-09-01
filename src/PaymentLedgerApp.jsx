@@ -107,6 +107,50 @@ export default function PaymentLedgerApp() {
 
     if (sendReceipt && ledger.tenantEmail) {
       setReceiptStatus("sending");
+      const colors = TYPE_COLORS[entry.appliesTo] || TYPE_COLORS.Other;
+      const plainBody = `Hi ${activeName},\n\nThis confirms we received your payment:\n\nDate: ${entry.date}\nAmount: $${entry.amount.toFixed(2)}\nApplies to: ${entry.appliesTo}\nMethod: ${entry.method}${entry.note ? `\nNote: ${entry.note}` : ""}\n\nKeep this for your records.\n\nThanks,\nIJAM Housing`;
+      const htmlBody = `
+        <div style="background:${PALEGREY};padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+          <div style="max-width:440px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid ${LIGHTGREY};">
+            <div style="padding:22px 28px;border-bottom:1px solid ${LIGHTGREY};">
+              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.12em;color:${MIDGREY};">IJAM HOUSING</p>
+              <p style="margin:2px 0 0;font-size:19px;font-weight:700;color:${CHARCOAL};">Payment Received</p>
+            </div>
+            <div style="padding:24px 28px;">
+              <p style="margin:0 0 18px;font-size:14px;color:${INK};">Hi ${activeName},</p>
+              <p style="margin:0 0 20px;font-size:14px;color:${INK};line-height:1.6;">This confirms we received your payment. Keep this email for your records.</p>
+              <table style="width:100%;border-collapse:collapse;">
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;color:${SLATE};border-top:1px solid ${LIGHTGREY};">Date</td>
+                  <td style="padding:10px 0;font-size:13px;color:${INK};text-align:right;border-top:1px solid ${LIGHTGREY};">${entry.date}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;color:${SLATE};border-top:1px solid ${LIGHTGREY};">Amount</td>
+                  <td style="padding:10px 0;font-size:18px;font-weight:700;color:${CHARCOAL};text-align:right;border-top:1px solid ${LIGHTGREY};">$${entry.amount.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;color:${SLATE};border-top:1px solid ${LIGHTGREY};">Applies to</td>
+                  <td style="padding:10px 0;text-align:right;border-top:1px solid ${LIGHTGREY};">
+                    <span style="display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:${colors.bg};color:${colors.text};">${entry.appliesTo}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;color:${SLATE};border-top:1px solid ${LIGHTGREY};">Method</td>
+                  <td style="padding:10px 0;font-size:13px;color:${INK};text-align:right;border-top:1px solid ${LIGHTGREY};">${entry.method}</td>
+                </tr>
+                ${entry.note ? `
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;color:${SLATE};border-top:1px solid ${LIGHTGREY};vertical-align:top;">Note</td>
+                  <td style="padding:10px 0;font-size:13px;color:${INK};text-align:right;border-top:1px solid ${LIGHTGREY};">${entry.note}</td>
+                </tr>` : ""}
+              </table>
+            </div>
+            <div style="padding:16px 28px;background:${PALEGREY};text-align:center;">
+              <p style="margin:0;font-size:12px;color:${MIDGREY};">Thanks — IJAM Housing</p>
+            </div>
+          </div>
+        </div>
+      `;
       try {
         const res = await fetch("/api/send-template-email", {
           method: "POST",
@@ -114,7 +158,8 @@ export default function PaymentLedgerApp() {
           body: JSON.stringify({
             to: ledger.tenantEmail,
             subject: `Payment received — $${entry.amount.toFixed(2)} (${entry.appliesTo})`,
-            body: `Hi ${activeName},\n\nThis confirms we received your payment:\n\nDate: ${entry.date}\nAmount: $${entry.amount.toFixed(2)}\nApplies to: ${entry.appliesTo}\nMethod: ${entry.method}${entry.note ? `\nNote: ${entry.note}` : ""}\n\nKeep this for your records.\n\nThanks,\nIJAM Housing`,
+            body: plainBody,
+            html: htmlBody,
           }),
         });
         const data = await res.json();
